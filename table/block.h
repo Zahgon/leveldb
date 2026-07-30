@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -25,7 +27,9 @@ class Block {
 
   ~Block();
 
-  size_t size() const { return size_; }
+  size_t size() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
   Iterator* NewIterator(const Comparator* comparator);
 
  private:

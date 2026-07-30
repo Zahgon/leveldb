@@ -16,7 +16,7 @@ namespace leveldb {
 
 class EnvTest : public testing::Test {
  public:
-  EnvTest() : env_(Env::Default()) {}
+  EnvTest() : env_(Env::Default()) { __builtin_trap() /* STUB: not implemented */; }
 
   Env* env_;
 };
@@ -144,17 +144,10 @@ struct State {
   int val GUARDED_BY(mu);
   int num_running GUARDED_BY(mu);
 
-  State(int val, int num_running) : val(val), num_running(num_running) {}
+  State(int val, int num_running) : val(val), num_running(num_running) { __builtin_trap() /* STUB: not implemented */; }
 };
 
-static void ThreadBody(void* arg) {
-  State* s = reinterpret_cast<State*>(arg);
-  s->mu.Lock();
-  s->val += 1;
-  s->num_running -= 1;
-  s->cvar.Signal();
-  s->mu.Unlock();
-}
+static void ThreadBody(void* arg) { __builtin_trap() /* STUB: not implemented */; }
 
 TEST_F(EnvTest, StartThread) {
   State state(0, 3);

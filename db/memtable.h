@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -27,16 +29,14 @@ class MemTable {
   MemTable& operator=(const MemTable&) = delete;
 
   // Increase reference count.
-  void Ref() { ++refs_; }
+  void Ref() {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Drop reference count.  Delete if no more references exist.
   void Unref() {
-    --refs_;
-    assert(refs_ >= 0);
-    if (refs_ <= 0) {
-      delete this;
-    }
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Returns an estimate of the number of bytes of data in use by this
   // data structure. It is safe to call when MemTable is being modified.
@@ -68,7 +68,9 @@ class MemTable {
 
   struct KeyComparator {
     const InternalKeyComparator comparator;
-    explicit KeyComparator(const InternalKeyComparator& c) : comparator(c) {}
+    explicit KeyComparator(const InternalKeyComparator& c) : comparator(c) {
+    __builtin_trap() /* STUB: not implemented */;
+}
     int operator()(const char* a, const char* b) const;
   };
 

@@ -1,3 +1,4 @@
+#include <stdexcept>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -90,14 +91,20 @@ struct leveldb_comparator_t : public Comparator {
   ~leveldb_comparator_t() override { (*destructor_)(state_); }
 
   int Compare(const Slice& a, const Slice& b) const override {
-    return (*compare_)(state_, a.data(), a.size(), b.data(), b.size());
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-  const char* Name() const override { return (*name_)(state_); }
+  const char* Name() const override {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // No-ops since the C binding does not support key shortening methods.
-  void FindShortestSeparator(std::string*, const Slice&) const override {}
-  void FindShortSuccessor(std::string* key) const override {}
+  void FindShortestSeparator(std::string*, const Slice&) const override {
+    __builtin_trap() /* STUB: not implemented */;
+}
+  void FindShortSuccessor(std::string* key) const override {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   void* state_;
   void (*destructor_)(void*);
@@ -109,25 +116,17 @@ struct leveldb_comparator_t : public Comparator {
 struct leveldb_filterpolicy_t : public FilterPolicy {
   ~leveldb_filterpolicy_t() override { (*destructor_)(state_); }
 
-  const char* Name() const override { return (*name_)(state_); }
+  const char* Name() const override {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   void CreateFilter(const Slice* keys, int n, std::string* dst) const override {
-    std::vector<const char*> key_pointers(n);
-    std::vector<size_t> key_sizes(n);
-    for (int i = 0; i < n; i++) {
-      key_pointers[i] = keys[i].data();
-      key_sizes[i] = keys[i].size();
-    }
-    size_t len;
-    char* filter = (*create_)(state_, &key_pointers[0], &key_sizes[0], n, &len);
-    dst->append(filter, len);
-    std::free(filter);
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   bool KeyMayMatch(const Slice& key, const Slice& filter) const override {
-    return (*key_match_)(state_, key.data(), key.size(), filter.data(),
-                         filter.size());
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   void* state_;
   void (*destructor_)(void*);
@@ -145,104 +144,60 @@ struct leveldb_env_t {
 };
 
 static bool SaveError(char** errptr, const Status& s) {
-  assert(errptr != nullptr);
-  if (s.ok()) {
-    return false;
-  } else if (*errptr == nullptr) {
-    *errptr = strdup(s.ToString().c_str());
-  } else {
-    // TODO(sanjay): Merge with existing error?
-    std::free(*errptr);
-    *errptr = strdup(s.ToString().c_str());
-  }
-  return true;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 static char* CopyString(const std::string& str) {
-  char* result =
-      reinterpret_cast<char*>(std::malloc(sizeof(char) * str.size()));
-  std::memcpy(result, str.data(), sizeof(char) * str.size());
-  return result;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 leveldb_t* leveldb_open(const leveldb_options_t* options, const char* name,
                         char** errptr) {
-  DB* db;
-  if (SaveError(errptr, DB::Open(options->rep, std::string(name), &db))) {
-    return nullptr;
-  }
-  leveldb_t* result = new leveldb_t;
-  result->rep = db;
-  return result;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_close(leveldb_t* db) {
-  delete db->rep;
-  delete db;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_put(leveldb_t* db, const leveldb_writeoptions_t* options,
                  const char* key, size_t keylen, const char* val, size_t vallen,
                  char** errptr) {
-  SaveError(errptr,
-            db->rep->Put(options->rep, Slice(key, keylen), Slice(val, vallen)));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_delete(leveldb_t* db, const leveldb_writeoptions_t* options,
                     const char* key, size_t keylen, char** errptr) {
-  SaveError(errptr, db->rep->Delete(options->rep, Slice(key, keylen)));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_write(leveldb_t* db, const leveldb_writeoptions_t* options,
                    leveldb_writebatch_t* batch, char** errptr) {
-  SaveError(errptr, db->rep->Write(options->rep, &batch->rep));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 char* leveldb_get(leveldb_t* db, const leveldb_readoptions_t* options,
                   const char* key, size_t keylen, size_t* vallen,
                   char** errptr) {
-  char* result = nullptr;
-  std::string tmp;
-  Status s = db->rep->Get(options->rep, Slice(key, keylen), &tmp);
-  if (s.ok()) {
-    *vallen = tmp.size();
-    result = CopyString(tmp);
-  } else {
-    *vallen = 0;
-    if (!s.IsNotFound()) {
-      SaveError(errptr, s);
-    }
-  }
-  return result;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 leveldb_iterator_t* leveldb_create_iterator(
     leveldb_t* db, const leveldb_readoptions_t* options) {
-  leveldb_iterator_t* result = new leveldb_iterator_t;
-  result->rep = db->rep->NewIterator(options->rep);
-  return result;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 const leveldb_snapshot_t* leveldb_create_snapshot(leveldb_t* db) {
-  leveldb_snapshot_t* result = new leveldb_snapshot_t;
-  result->rep = db->rep->GetSnapshot();
-  return result;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_release_snapshot(leveldb_t* db,
                               const leveldb_snapshot_t* snapshot) {
-  db->rep->ReleaseSnapshot(snapshot->rep);
-  delete snapshot;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 char* leveldb_property_value(leveldb_t* db, const char* propname) {
-  std::string tmp;
-  if (db->rep->GetProperty(Slice(propname), &tmp)) {
-    // We use strdup() since we expect human readable output.
-    return strdup(tmp.c_str());
-  } else {
-    return nullptr;
-  }
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_approximate_sizes(leveldb_t* db, int num_ranges,
@@ -251,92 +206,85 @@ void leveldb_approximate_sizes(leveldb_t* db, int num_ranges,
                                const char* const* range_limit_key,
                                const size_t* range_limit_key_len,
                                uint64_t* sizes) {
-  Range* ranges = new Range[num_ranges];
-  for (int i = 0; i < num_ranges; i++) {
-    ranges[i].start = Slice(range_start_key[i], range_start_key_len[i]);
-    ranges[i].limit = Slice(range_limit_key[i], range_limit_key_len[i]);
-  }
-  db->rep->GetApproximateSizes(ranges, num_ranges, sizes);
-  delete[] ranges;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_compact_range(leveldb_t* db, const char* start_key,
                            size_t start_key_len, const char* limit_key,
                            size_t limit_key_len) {
-  Slice a, b;
-  db->rep->CompactRange(
-      // Pass null Slice if corresponding "const char*" is null
-      (start_key ? (a = Slice(start_key, start_key_len), &a) : nullptr),
-      (limit_key ? (b = Slice(limit_key, limit_key_len), &b) : nullptr));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_destroy_db(const leveldb_options_t* options, const char* name,
                         char** errptr) {
-  SaveError(errptr, DestroyDB(name, options->rep));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_repair_db(const leveldb_options_t* options, const char* name,
                        char** errptr) {
-  SaveError(errptr, RepairDB(name, options->rep));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_iter_destroy(leveldb_iterator_t* iter) {
-  delete iter->rep;
-  delete iter;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 uint8_t leveldb_iter_valid(const leveldb_iterator_t* iter) {
-  return iter->rep->Valid();
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_iter_seek_to_first(leveldb_iterator_t* iter) {
-  iter->rep->SeekToFirst();
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_iter_seek_to_last(leveldb_iterator_t* iter) {
-  iter->rep->SeekToLast();
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_iter_seek(leveldb_iterator_t* iter, const char* k, size_t klen) {
-  iter->rep->Seek(Slice(k, klen));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
-void leveldb_iter_next(leveldb_iterator_t* iter) { iter->rep->Next(); }
+void leveldb_iter_next(leveldb_iterator_t* iter) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-void leveldb_iter_prev(leveldb_iterator_t* iter) { iter->rep->Prev(); }
+void leveldb_iter_prev(leveldb_iterator_t* iter) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
 const char* leveldb_iter_key(const leveldb_iterator_t* iter, size_t* klen) {
-  Slice s = iter->rep->key();
-  *klen = s.size();
-  return s.data();
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 const char* leveldb_iter_value(const leveldb_iterator_t* iter, size_t* vlen) {
-  Slice s = iter->rep->value();
-  *vlen = s.size();
-  return s.data();
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_iter_get_error(const leveldb_iterator_t* iter, char** errptr) {
-  SaveError(errptr, iter->rep->status());
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 leveldb_writebatch_t* leveldb_writebatch_create() {
-  return new leveldb_writebatch_t;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
-void leveldb_writebatch_destroy(leveldb_writebatch_t* b) { delete b; }
+void leveldb_writebatch_destroy(leveldb_writebatch_t* b) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-void leveldb_writebatch_clear(leveldb_writebatch_t* b) { b->rep.Clear(); }
+void leveldb_writebatch_clear(leveldb_writebatch_t* b) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
 void leveldb_writebatch_put(leveldb_writebatch_t* b, const char* key,
                             size_t klen, const char* val, size_t vlen) {
-  b->rep.Put(Slice(key, klen), Slice(val, vlen));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_writebatch_delete(leveldb_writebatch_t* b, const char* key,
                                size_t klen) {
-  b->rep.Delete(Slice(key, klen));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_writebatch_iterate(const leveldb_writebatch_t* b, void* state,
@@ -344,90 +292,78 @@ void leveldb_writebatch_iterate(const leveldb_writebatch_t* b, void* state,
                                             const char* v, size_t vlen),
                                 void (*deleted)(void*, const char* k,
                                                 size_t klen)) {
-  class H : public WriteBatch::Handler {
-   public:
-    void* state_;
-    void (*put_)(void*, const char* k, size_t klen, const char* v, size_t vlen);
-    void (*deleted_)(void*, const char* k, size_t klen);
-    void Put(const Slice& key, const Slice& value) override {
-      (*put_)(state_, key.data(), key.size(), value.data(), value.size());
-    }
-    void Delete(const Slice& key) override {
-      (*deleted_)(state_, key.data(), key.size());
-    }
-  };
-  H handler;
-  handler.state_ = state;
-  handler.put_ = put;
-  handler.deleted_ = deleted;
-  b->rep.Iterate(&handler);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_writebatch_append(leveldb_writebatch_t* destination,
                                const leveldb_writebatch_t* source) {
-  destination->rep.Append(source->rep);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
-leveldb_options_t* leveldb_options_create() { return new leveldb_options_t; }
+leveldb_options_t* leveldb_options_create() {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-void leveldb_options_destroy(leveldb_options_t* options) { delete options; }
+void leveldb_options_destroy(leveldb_options_t* options) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
 void leveldb_options_set_comparator(leveldb_options_t* opt,
                                     leveldb_comparator_t* cmp) {
-  opt->rep.comparator = cmp;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_options_set_filter_policy(leveldb_options_t* opt,
                                        leveldb_filterpolicy_t* policy) {
-  opt->rep.filter_policy = policy;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_options_set_create_if_missing(leveldb_options_t* opt, uint8_t v) {
-  opt->rep.create_if_missing = v;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_options_set_error_if_exists(leveldb_options_t* opt, uint8_t v) {
-  opt->rep.error_if_exists = v;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_options_set_paranoid_checks(leveldb_options_t* opt, uint8_t v) {
-  opt->rep.paranoid_checks = v;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_options_set_env(leveldb_options_t* opt, leveldb_env_t* env) {
-  opt->rep.env = (env ? env->rep : nullptr);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_options_set_info_log(leveldb_options_t* opt, leveldb_logger_t* l) {
-  opt->rep.info_log = (l ? l->rep : nullptr);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_options_set_write_buffer_size(leveldb_options_t* opt, size_t s) {
-  opt->rep.write_buffer_size = s;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_options_set_max_open_files(leveldb_options_t* opt, int n) {
-  opt->rep.max_open_files = n;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_options_set_cache(leveldb_options_t* opt, leveldb_cache_t* c) {
-  opt->rep.block_cache = c->rep;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_options_set_block_size(leveldb_options_t* opt, size_t s) {
-  opt->rep.block_size = s;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_options_set_block_restart_interval(leveldb_options_t* opt, int n) {
-  opt->rep.block_restart_interval = n;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_options_set_max_file_size(leveldb_options_t* opt, size_t s) {
-  opt->rep.max_file_size = s;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_options_set_compression(leveldb_options_t* opt, int t) {
-  opt->rep.compression = static_cast<CompressionType>(t);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 leveldb_comparator_t* leveldb_comparator_create(
@@ -435,15 +371,12 @@ leveldb_comparator_t* leveldb_comparator_create(
     int (*compare)(void*, const char* a, size_t alen, const char* b,
                    size_t blen),
     const char* (*name)(void*)) {
-  leveldb_comparator_t* result = new leveldb_comparator_t;
-  result->state_ = state;
-  result->destructor_ = destructor;
-  result->compare_ = compare;
-  result->name_ = name;
-  return result;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
-void leveldb_comparator_destroy(leveldb_comparator_t* cmp) { delete cmp; }
+void leveldb_comparator_destroy(leveldb_comparator_t* cmp) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
 leveldb_filterpolicy_t* leveldb_filterpolicy_create(
     void* state, void (*destructor)(void*),
@@ -453,113 +386,81 @@ leveldb_filterpolicy_t* leveldb_filterpolicy_create(
     uint8_t (*key_may_match)(void*, const char* key, size_t length,
                              const char* filter, size_t filter_length),
     const char* (*name)(void*)) {
-  leveldb_filterpolicy_t* result = new leveldb_filterpolicy_t;
-  result->state_ = state;
-  result->destructor_ = destructor;
-  result->create_ = create_filter;
-  result->key_match_ = key_may_match;
-  result->name_ = name;
-  return result;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_filterpolicy_destroy(leveldb_filterpolicy_t* filter) {
-  delete filter;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 leveldb_filterpolicy_t* leveldb_filterpolicy_create_bloom(int bits_per_key) {
-  // Make a leveldb_filterpolicy_t, but override all of its methods so
-  // they delegate to a NewBloomFilterPolicy() instead of user
-  // supplied C functions.
-  struct Wrapper : public leveldb_filterpolicy_t {
-    static void DoNothing(void*) {}
-
-    ~Wrapper() { delete rep_; }
-    const char* Name() const { return rep_->Name(); }
-    void CreateFilter(const Slice* keys, int n, std::string* dst) const {
-      return rep_->CreateFilter(keys, n, dst);
-    }
-    bool KeyMayMatch(const Slice& key, const Slice& filter) const {
-      return rep_->KeyMayMatch(key, filter);
-    }
-
-    const FilterPolicy* rep_;
-  };
-  Wrapper* wrapper = new Wrapper;
-  wrapper->rep_ = NewBloomFilterPolicy(bits_per_key);
-  wrapper->state_ = nullptr;
-  wrapper->destructor_ = &Wrapper::DoNothing;
-  return wrapper;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 leveldb_readoptions_t* leveldb_readoptions_create() {
-  return new leveldb_readoptions_t;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
-void leveldb_readoptions_destroy(leveldb_readoptions_t* opt) { delete opt; }
+void leveldb_readoptions_destroy(leveldb_readoptions_t* opt) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
 void leveldb_readoptions_set_verify_checksums(leveldb_readoptions_t* opt,
                                               uint8_t v) {
-  opt->rep.verify_checksums = v;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_readoptions_set_fill_cache(leveldb_readoptions_t* opt, uint8_t v) {
-  opt->rep.fill_cache = v;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_readoptions_set_snapshot(leveldb_readoptions_t* opt,
                                       const leveldb_snapshot_t* snap) {
-  opt->rep.snapshot = (snap ? snap->rep : nullptr);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 leveldb_writeoptions_t* leveldb_writeoptions_create() {
-  return new leveldb_writeoptions_t;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
-void leveldb_writeoptions_destroy(leveldb_writeoptions_t* opt) { delete opt; }
+void leveldb_writeoptions_destroy(leveldb_writeoptions_t* opt) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
 void leveldb_writeoptions_set_sync(leveldb_writeoptions_t* opt, uint8_t v) {
-  opt->rep.sync = v;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 leveldb_cache_t* leveldb_cache_create_lru(size_t capacity) {
-  leveldb_cache_t* c = new leveldb_cache_t;
-  c->rep = NewLRUCache(capacity);
-  return c;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_cache_destroy(leveldb_cache_t* cache) {
-  delete cache->rep;
-  delete cache;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 leveldb_env_t* leveldb_create_default_env() {
-  leveldb_env_t* result = new leveldb_env_t;
-  result->rep = Env::Default();
-  result->is_default = true;
-  return result;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void leveldb_env_destroy(leveldb_env_t* env) {
-  if (!env->is_default) delete env->rep;
-  delete env;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 char* leveldb_env_get_test_directory(leveldb_env_t* env) {
-  std::string result;
-  if (!env->rep->GetTestDirectory(&result).ok()) {
-    return nullptr;
-  }
-
-  char* buffer = static_cast<char*>(std::malloc(result.size() + 1));
-  std::memcpy(buffer, result.data(), result.size());
-  buffer[result.size()] = '\0';
-  return buffer;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
-void leveldb_free(void* ptr) { std::free(ptr); }
+void leveldb_free(void* ptr) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-int leveldb_major_version() { return kMajorVersion; }
+int leveldb_major_version() {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-int leveldb_minor_version() { return kMinorVersion; }
+int leveldb_minor_version() {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
 }  // end extern "C"

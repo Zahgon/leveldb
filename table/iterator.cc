@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -7,8 +9,7 @@
 namespace leveldb {
 
 Iterator::Iterator() {
-  cleanup_head_.function = nullptr;
-  cleanup_head_.next = nullptr;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 Iterator::~Iterator() {
@@ -24,42 +25,45 @@ Iterator::~Iterator() {
 }
 
 void Iterator::RegisterCleanup(CleanupFunction func, void* arg1, void* arg2) {
-  assert(func != nullptr);
-  CleanupNode* node;
-  if (cleanup_head_.IsEmpty()) {
-    node = &cleanup_head_;
-  } else {
-    node = new CleanupNode();
-    node->next = cleanup_head_.next;
-    cleanup_head_.next = node;
-  }
-  node->function = func;
-  node->arg1 = arg1;
-  node->arg2 = arg2;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 namespace {
 
 class EmptyIterator : public Iterator {
  public:
-  EmptyIterator(const Status& s) : status_(s) {}
+  EmptyIterator(const Status& s) : status_(s) {
+    __builtin_trap() /* STUB: not implemented */;
+}
   ~EmptyIterator() override = default;
 
-  bool Valid() const override { return false; }
-  void Seek(const Slice& target) override {}
-  void SeekToFirst() override {}
-  void SeekToLast() override {}
-  void Next() override { assert(false); }
-  void Prev() override { assert(false); }
+  bool Valid() const override {
+    __builtin_trap() /* STUB: not implemented */;
+}
+  void Seek(const Slice& target) override {
+    __builtin_trap() /* STUB: not implemented */;
+}
+  void SeekToFirst() override {
+    __builtin_trap() /* STUB: not implemented */;
+}
+  void SeekToLast() override {
+    __builtin_trap() /* STUB: not implemented */;
+}
+  void Next() override {
+    __builtin_trap() /* STUB: not implemented */;
+}
+  void Prev() override {
+    __builtin_trap() /* STUB: not implemented */;
+}
   Slice key() const override {
-    assert(false);
-    return Slice();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
   Slice value() const override {
-    assert(false);
-    return Slice();
-  }
-  Status status() const override { return status_; }
+    __builtin_trap() /* STUB: not implemented */;
+}
+  Status status() const override {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
   Status status_;
@@ -67,10 +71,12 @@ class EmptyIterator : public Iterator {
 
 }  // anonymous namespace
 
-Iterator* NewEmptyIterator() { return new EmptyIterator(Status::OK()); }
+Iterator* NewEmptyIterator() {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
 Iterator* NewErrorIterator(const Status& status) {
-  return new EmptyIterator(status);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 }  // namespace leveldb

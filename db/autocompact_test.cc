@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2013 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -103,8 +105,12 @@ void AutoCompactTest::DoReads(int n) {
   ASSERT_GE(final_other_size, initial_other_size / 5 - 1048576);
 }
 
-TEST_F(AutoCompactTest, ReadAll) { DoReads(kCount); }
+TEST_F(AutoCompactTest, ReadAll) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-TEST_F(AutoCompactTest, ReadHalf) { DoReads(kCount / 2); }
+TEST_F(AutoCompactTest, ReadHalf) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
 }  // namespace leveldb

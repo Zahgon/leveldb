@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -38,7 +40,9 @@ class BlockBuilder {
   size_t CurrentSizeEstimate() const;
 
   // Return true iff no entries have been added since the last Reset()
-  bool empty() const { return buffer_.empty(); }
+  bool empty() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
   const Options* options_;

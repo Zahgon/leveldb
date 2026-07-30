@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -109,7 +111,9 @@ class Version {
   int PickLevelForMemTableOutput(const Slice& smallest_user_key,
                                  const Slice& largest_user_key);
 
-  int NumFiles(int level) const { return files_[level].size(); }
+  int NumFiles(int level) const {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Return a human readable string that describes this version's contents.
   std::string DebugString() const;
@@ -128,7 +132,9 @@ class Version {
         file_to_compact_(nullptr),
         file_to_compact_level_(-1),
         compaction_score_(-1),
-        compaction_level_(-1) {}
+        compaction_level_(-1) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Version(const Version&) = delete;
   Version& operator=(const Version&) = delete;
@@ -185,22 +191,26 @@ class VersionSet {
   Status Recover(bool* save_manifest);
 
   // Return the current version.
-  Version* current() const { return current_; }
+  Version* current() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Return the current manifest file number
-  uint64_t ManifestFileNumber() const { return manifest_file_number_; }
+  uint64_t ManifestFileNumber() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Allocate and return a new file number
-  uint64_t NewFileNumber() { return next_file_number_++; }
+  uint64_t NewFileNumber() {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Arrange to reuse "file_number" unless a newer file number has
   // already been allocated.
   // REQUIRES: "file_number" was returned by a call to NewFileNumber().
   void ReuseFileNumber(uint64_t file_number) {
-    if (next_file_number_ == file_number + 1) {
-      next_file_number_ = file_number;
-    }
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Return the number of Table files at the specified level.
   int NumLevelFiles(int level) const;
@@ -209,23 +219,28 @@ class VersionSet {
   int64_t NumLevelBytes(int level) const;
 
   // Return the last sequence number.
-  uint64_t LastSequence() const { return last_sequence_; }
+  uint64_t LastSequence() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Set the last sequence number to s.
   void SetLastSequence(uint64_t s) {
-    assert(s >= last_sequence_);
-    last_sequence_ = s;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Mark the specified file number as used.
   void MarkFileNumberUsed(uint64_t number);
 
   // Return the current log file number.
-  uint64_t LogNumber() const { return log_number_; }
+  uint64_t LogNumber() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Return the log file number for the log file that is currently
   // being compacted, or zero if there is no such log file.
-  uint64_t PrevLogNumber() const { return prev_log_number_; }
+  uint64_t PrevLogNumber() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Pick level and inputs for a new compaction.
   // Returns nullptr if there is no compaction to be done.
@@ -250,9 +265,8 @@ class VersionSet {
 
   // Returns true iff some level needs a compaction.
   bool NeedsCompaction() const {
-    Version* v = current_;
-    return (v->compaction_score_ >= 1) || (v->file_to_compact_ != nullptr);
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Add all files listed in any live version to *live.
   // May also mutate some internal state.
@@ -322,20 +336,30 @@ class Compaction {
 
   // Return the level that is being compacted.  Inputs from "level"
   // and "level+1" will be merged to produce a set of "level+1" files.
-  int level() const { return level_; }
+  int level() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Return the object that holds the edits to the descriptor done
   // by this compaction.
-  VersionEdit* edit() { return &edit_; }
+  VersionEdit* edit() {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // "which" must be either 0 or 1
-  int num_input_files(int which) const { return inputs_[which].size(); }
+  int num_input_files(int which) const {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Return the ith input file at "level()+which" ("which" must be 0 or 1).
-  FileMetaData* input(int which, int i) const { return inputs_[which][i]; }
+  FileMetaData* input(int which, int i) const {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Maximum size of files to build during this compaction.
-  uint64_t MaxOutputFileSize() const { return max_output_file_size_; }
+  uint64_t MaxOutputFileSize() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Is this a trivial compaction that can be implemented by just
   // moving a single input file to the next level (no merging or splitting)

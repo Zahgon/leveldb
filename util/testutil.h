@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -15,7 +17,9 @@
 namespace leveldb {
 namespace test {
 
-MATCHER(IsOK, "") { return arg.ok(); }
+MATCHER(IsOK, "") {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
 // Macros for testing the results of functions that return leveldb::Status or
 // absl::StatusOr<T> (for any type T).
@@ -26,7 +30,7 @@ MATCHER(IsOK, "") { return arg.ok(); }
 
 // Returns the random seed used at the start of the current test run.
 inline int RandomSeed() {
-  return testing::UnitTest::GetInstance()->random_seed();
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 // Store in *dst a random string of length "len" and return a Slice that
@@ -52,28 +56,20 @@ class ErrorEnv : public EnvWrapper {
   ErrorEnv()
       : EnvWrapper(NewMemEnv(Env::Default())),
         writable_file_error_(false),
-        num_writable_file_errors_(0) {}
+        num_writable_file_errors_(0) {
+    __builtin_trap() /* STUB: not implemented */;
+}
   ~ErrorEnv() override { delete target(); }
 
   Status NewWritableFile(const std::string& fname,
                          WritableFile** result) override {
-    if (writable_file_error_) {
-      ++num_writable_file_errors_;
-      *result = nullptr;
-      return Status::IOError(fname, "fake error");
-    }
-    return target()->NewWritableFile(fname, result);
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status NewAppendableFile(const std::string& fname,
                            WritableFile** result) override {
-    if (writable_file_error_) {
-      ++num_writable_file_errors_;
-      *result = nullptr;
-      return Status::IOError(fname, "fake error");
-    }
-    return target()->NewAppendableFile(fname, result);
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 };
 
 }  // namespace test

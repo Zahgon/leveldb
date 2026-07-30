@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -31,8 +33,8 @@ class Arena {
   // Returns an estimate of the total memory usage of data allocated
   // by the arena.
   size_t MemoryUsage() const {
-    return memory_usage_.load(std::memory_order_relaxed);
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
   char* AllocateFallback(size_t bytes);
@@ -53,17 +55,7 @@ class Arena {
 };
 
 inline char* Arena::Allocate(size_t bytes) {
-  // The semantics of what to return are a bit messy if we allow
-  // 0-byte allocations, so we disallow them here (we don't need
-  // them for our internal use).
-  assert(bytes > 0);
-  if (bytes <= alloc_bytes_remaining_) {
-    char* result = alloc_ptr_;
-    alloc_ptr_ += bytes;
-    alloc_bytes_remaining_ -= bytes;
-    return result;
-  }
-  return AllocateFallback(bytes);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 }  // namespace leveldb

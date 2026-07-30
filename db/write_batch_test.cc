@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -52,81 +54,23 @@ static std::string PrintContents(WriteBatch* b) {
 }
 
 TEST(WriteBatchTest, Empty) {
-  WriteBatch batch;
-  ASSERT_EQ("", PrintContents(&batch));
-  ASSERT_EQ(0, WriteBatchInternal::Count(&batch));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST(WriteBatchTest, Multiple) {
-  WriteBatch batch;
-  batch.Put(Slice("foo"), Slice("bar"));
-  batch.Delete(Slice("box"));
-  batch.Put(Slice("baz"), Slice("boo"));
-  WriteBatchInternal::SetSequence(&batch, 100);
-  ASSERT_EQ(100, WriteBatchInternal::Sequence(&batch));
-  ASSERT_EQ(3, WriteBatchInternal::Count(&batch));
-  ASSERT_EQ(
-      "Put(baz, boo)@102"
-      "Delete(box)@101"
-      "Put(foo, bar)@100",
-      PrintContents(&batch));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST(WriteBatchTest, Corruption) {
-  WriteBatch batch;
-  batch.Put(Slice("foo"), Slice("bar"));
-  batch.Delete(Slice("box"));
-  WriteBatchInternal::SetSequence(&batch, 200);
-  Slice contents = WriteBatchInternal::Contents(&batch);
-  WriteBatchInternal::SetContents(&batch,
-                                  Slice(contents.data(), contents.size() - 1));
-  ASSERT_EQ(
-      "Put(foo, bar)@200"
-      "ParseError()",
-      PrintContents(&batch));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST(WriteBatchTest, Append) {
-  WriteBatch b1, b2;
-  WriteBatchInternal::SetSequence(&b1, 200);
-  WriteBatchInternal::SetSequence(&b2, 300);
-  b1.Append(b2);
-  ASSERT_EQ("", PrintContents(&b1));
-  b2.Put("a", "va");
-  b1.Append(b2);
-  ASSERT_EQ("Put(a, va)@200", PrintContents(&b1));
-  b2.Clear();
-  b2.Put("b", "vb");
-  b1.Append(b2);
-  ASSERT_EQ(
-      "Put(a, va)@200"
-      "Put(b, vb)@201",
-      PrintContents(&b1));
-  b2.Delete("foo");
-  b1.Append(b2);
-  ASSERT_EQ(
-      "Put(a, va)@200"
-      "Put(b, vb)@202"
-      "Put(b, vb)@201"
-      "Delete(foo)@203",
-      PrintContents(&b1));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST(WriteBatchTest, ApproximateSize) {
-  WriteBatch batch;
-  size_t empty_size = batch.ApproximateSize();
-
-  batch.Put(Slice("foo"), Slice("bar"));
-  size_t one_key_size = batch.ApproximateSize();
-  ASSERT_LT(empty_size, one_key_size);
-
-  batch.Put(Slice("baz"), Slice("boo"));
-  size_t two_keys_size = batch.ApproximateSize();
-  ASSERT_LT(one_key_size, two_keys_size);
-
-  batch.Delete(Slice("box"));
-  size_t post_delete_size = batch.ApproximateSize();
-  ASSERT_LT(two_keys_size, post_delete_size);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 }  // namespace leveldb

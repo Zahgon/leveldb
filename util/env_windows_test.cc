@@ -14,11 +14,9 @@ static const int kMMapLimit = 4;
 
 class EnvWindowsTest : public testing::Test {
  public:
-  static void SetFileLimits(int mmap_limit) {
-    EnvWindowsTestHelper::SetReadOnlyMMapLimit(mmap_limit);
-  }
+  static void SetFileLimits(int mmap_limit) { __builtin_trap() /* STUB: not implemented */; }
 
-  EnvWindowsTest() : env_(Env::Default()) {}
+  EnvWindowsTest() : env_(Env::Default()) { __builtin_trap() /* STUB: not implemented */; }
 
   Env* env_;
 };
@@ -57,9 +55,4 @@ TEST_F(EnvWindowsTest, TestOpenOnRead) {
 
 }  // namespace leveldb
 
-int main(int argc, char** argv) {
-  // All tests currently run with the same read-only file limits.
-  leveldb::EnvWindowsTest::SetFileLimits(leveldb::kMMapLimit);
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
+int main(int argc, char** argv) { __builtin_trap() /* STUB: not implemented */; }

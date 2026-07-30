@@ -1,3 +1,4 @@
+#include <stdexcept>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -59,11 +60,7 @@ constexpr const int kOpenBaseFlags = 0;
 constexpr const size_t kWritableFileBufferSize = 65536;
 
 Status PosixError(const std::string& context, int error_number) {
-  if (error_number == ENOENT) {
-    return Status::NotFound(context, std::strerror(error_number));
-  } else {
-    return Status::IOError(context, std::strerror(error_number));
-  }
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 // Helper class to limit resource usage to avoid exhaustion.
@@ -79,8 +76,8 @@ class Limiter {
         max_acquires_(max_acquires),
 #endif  // !defined(NDEBUG)
         acquires_allowed_(max_acquires) {
-    assert(max_acquires >= 0);
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Limiter(const Limiter&) = delete;
   Limiter operator=(const Limiter&) = delete;
@@ -88,33 +85,14 @@ class Limiter {
   // If another resource is available, acquire it and return true.
   // Else return false.
   bool Acquire() {
-    int old_acquires_allowed =
-        acquires_allowed_.fetch_sub(1, std::memory_order_relaxed);
-
-    if (old_acquires_allowed > 0) return true;
-
-    int pre_increment_acquires_allowed =
-        acquires_allowed_.fetch_add(1, std::memory_order_relaxed);
-
-    // Silence compiler warnings about unused arguments when NDEBUG is defined.
-    (void)pre_increment_acquires_allowed;
-    // If the check below fails, Release() was called more times than acquire.
-    assert(pre_increment_acquires_allowed < max_acquires_);
-
-    return false;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Release a resource acquired by a previous call to Acquire() that returned
   // true.
   void Release() {
-    int old_acquires_allowed =
-        acquires_allowed_.fetch_add(1, std::memory_order_relaxed);
-
-    // Silence compiler warnings about unused arguments when NDEBUG is defined.
-    (void)old_acquires_allowed;
-    // If the check below fails, Release() was called more times than acquire.
-    assert(old_acquires_allowed < max_acquires_);
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
 #if !defined(NDEBUG)
@@ -136,32 +114,18 @@ class Limiter {
 class PosixSequentialFile final : public SequentialFile {
  public:
   PosixSequentialFile(std::string filename, int fd)
-      : fd_(fd), filename_(std::move(filename)) {}
+      : fd_(fd), filename_(std::move(filename)) {
+    __builtin_trap() /* STUB: not implemented */;
+}
   ~PosixSequentialFile() override { close(fd_); }
 
   Status Read(size_t n, Slice* result, char* scratch) override {
-    Status status;
-    while (true) {
-      ::ssize_t read_size = ::read(fd_, scratch, n);
-      if (read_size < 0) {  // Read error.
-        if (errno == EINTR) {
-          continue;  // Retry
-        }
-        status = PosixError(filename_, errno);
-        break;
-      }
-      *result = Slice(scratch, read_size);
-      break;
-    }
-    return status;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status Skip(uint64_t n) override {
-    if (::lseek(fd_, n, SEEK_CUR) == static_cast<off_t>(-1)) {
-      return PosixError(filename_, errno);
-    }
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
   const int fd_;
@@ -182,11 +146,8 @@ class PosixRandomAccessFile final : public RandomAccessFile {
         fd_(has_permanent_fd_ ? fd : -1),
         fd_limiter_(fd_limiter),
         filename_(std::move(filename)) {
-    if (!has_permanent_fd_) {
-      assert(fd_ == -1);
-      ::close(fd);  // The file will be opened on every read.
-    }
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   ~PosixRandomAccessFile() override {
     if (has_permanent_fd_) {
@@ -198,30 +159,8 @@ class PosixRandomAccessFile final : public RandomAccessFile {
 
   Status Read(uint64_t offset, size_t n, Slice* result,
               char* scratch) const override {
-    int fd = fd_;
-    if (!has_permanent_fd_) {
-      fd = ::open(filename_.c_str(), O_RDONLY | kOpenBaseFlags);
-      if (fd < 0) {
-        return PosixError(filename_, errno);
-      }
-    }
-
-    assert(fd != -1);
-
-    Status status;
-    ssize_t read_size = ::pread(fd, scratch, n, static_cast<off_t>(offset));
-    *result = Slice(scratch, (read_size < 0) ? 0 : read_size);
-    if (read_size < 0) {
-      // An error: return a non-ok status.
-      status = PosixError(filename_, errno);
-    }
-    if (!has_permanent_fd_) {
-      // Close the temporary file descriptor opened earlier.
-      assert(fd != fd_);
-      ::close(fd);
-    }
-    return status;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
   const bool has_permanent_fd_;  // If false, the file is opened on every read.
@@ -249,7 +188,9 @@ class PosixMmapReadableFile final : public RandomAccessFile {
       : mmap_base_(mmap_base),
         length_(length),
         mmap_limiter_(mmap_limiter),
-        filename_(std::move(filename)) {}
+        filename_(std::move(filename)) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   ~PosixMmapReadableFile() override {
     ::munmap(static_cast<void*>(mmap_base_), length_);
@@ -258,14 +199,8 @@ class PosixMmapReadableFile final : public RandomAccessFile {
 
   Status Read(uint64_t offset, size_t n, Slice* result,
               char* scratch) const override {
-    if (offset + n > length_) {
-      *result = Slice();
-      return PosixError(filename_, EINVAL);
-    }
-
-    *result = Slice(mmap_base_ + offset, n);
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
   char* const mmap_base_;
@@ -281,7 +216,9 @@ class PosixWritableFile final : public WritableFile {
         fd_(fd),
         is_manifest_(IsManifest(filename)),
         filename_(std::move(filename)),
-        dirname_(Dirname(filename_)) {}
+        dirname_(Dirname(filename_)) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   ~PosixWritableFile() override {
     if (fd_ >= 0) {
@@ -291,102 +228,33 @@ class PosixWritableFile final : public WritableFile {
   }
 
   Status Append(const Slice& data) override {
-    size_t write_size = data.size();
-    const char* write_data = data.data();
-
-    // Fit as much as possible into buffer.
-    size_t copy_size = std::min(write_size, kWritableFileBufferSize - pos_);
-    std::memcpy(buf_ + pos_, write_data, copy_size);
-    write_data += copy_size;
-    write_size -= copy_size;
-    pos_ += copy_size;
-    if (write_size == 0) {
-      return Status::OK();
-    }
-
-    // Can't fit in buffer, so need to do at least one write.
-    Status status = FlushBuffer();
-    if (!status.ok()) {
-      return status;
-    }
-
-    // Small writes go to buffer, large writes are written directly.
-    if (write_size < kWritableFileBufferSize) {
-      std::memcpy(buf_, write_data, write_size);
-      pos_ = write_size;
-      return Status::OK();
-    }
-    return WriteUnbuffered(write_data, write_size);
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status Close() override {
-    Status status = FlushBuffer();
-    const int close_result = ::close(fd_);
-    if (close_result < 0 && status.ok()) {
-      status = PosixError(filename_, errno);
-    }
-    fd_ = -1;
-    return status;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-  Status Flush() override { return FlushBuffer(); }
+  Status Flush() override {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status Sync() override {
-    // Ensure new files referred to by the manifest are in the filesystem.
-    //
-    // This needs to happen before the manifest file is flushed to disk, to
-    // avoid crashing in a state where the manifest refers to files that are not
-    // yet on disk.
-    Status status = SyncDirIfManifest();
-    if (!status.ok()) {
-      return status;
-    }
-
-    status = FlushBuffer();
-    if (!status.ok()) {
-      return status;
-    }
-
-    return SyncFd(fd_, filename_);
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
   Status FlushBuffer() {
-    Status status = WriteUnbuffered(buf_, pos_);
-    pos_ = 0;
-    return status;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status WriteUnbuffered(const char* data, size_t size) {
-    while (size > 0) {
-      ssize_t write_result = ::write(fd_, data, size);
-      if (write_result < 0) {
-        if (errno == EINTR) {
-          continue;  // Retry
-        }
-        return PosixError(filename_, errno);
-      }
-      data += write_result;
-      size -= write_result;
-    }
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status SyncDirIfManifest() {
-    Status status;
-    if (!is_manifest_) {
-      return status;
-    }
-
-    int fd = ::open(dirname_.c_str(), O_RDONLY | kOpenBaseFlags);
-    if (fd < 0) {
-      status = PosixError(dirname_, errno);
-    } else {
-      status = SyncFd(fd, dirname_);
-      ::close(fd);
-    }
-    return status;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Ensures that all the caches associated with the given file descriptor's
   // data are flushed all the way to durable media, and can withstand power
@@ -395,64 +263,28 @@ class PosixWritableFile final : public WritableFile {
   // The path argument is only used to populate the description string in the
   // returned Status if an error occurs.
   static Status SyncFd(int fd, const std::string& fd_path) {
-#if HAVE_FULLFSYNC
-    // On macOS and iOS, fsync() doesn't guarantee durability past power
-    // failures. fcntl(F_FULLFSYNC) is required for that purpose. Some
-    // filesystems don't support fcntl(F_FULLFSYNC), and require a fallback to
-    // fsync().
-    if (::fcntl(fd, F_FULLFSYNC) == 0) {
-      return Status::OK();
-    }
-#endif  // HAVE_FULLFSYNC
-
-#if HAVE_FDATASYNC
-    bool sync_success = ::fdatasync(fd) == 0;
-#else
-    bool sync_success = ::fsync(fd) == 0;
-#endif  // HAVE_FDATASYNC
-
-    if (sync_success) {
-      return Status::OK();
-    }
-    return PosixError(fd_path, errno);
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Returns the directory name in a path pointing to a file.
   //
   // Returns "." if the path does not contain any directory separator.
   static std::string Dirname(const std::string& filename) {
-    std::string::size_type separator_pos = filename.rfind('/');
-    if (separator_pos == std::string::npos) {
-      return std::string(".");
-    }
-    // The filename component should not contain a path separator. If it does,
-    // the splitting was done incorrectly.
-    assert(filename.find('/', separator_pos + 1) == std::string::npos);
-
-    return filename.substr(0, separator_pos);
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Extracts the file name from a path pointing to a file.
   //
   // The returned Slice points to |filename|'s data buffer, so it is only valid
   // while |filename| is alive and unchanged.
   static Slice Basename(const std::string& filename) {
-    std::string::size_type separator_pos = filename.rfind('/');
-    if (separator_pos == std::string::npos) {
-      return Slice(filename);
-    }
-    // The filename component should not contain a path separator. If it does,
-    // the splitting was done incorrectly.
-    assert(filename.find('/', separator_pos + 1) == std::string::npos);
-
-    return Slice(filename.data() + separator_pos + 1,
-                 filename.length() - separator_pos - 1);
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // True if the given file is a manifest file.
   static bool IsManifest(const std::string& filename) {
-    return Basename(filename).starts_with("MANIFEST");
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // buf_[0, pos_ - 1] contains data to be written to fd_.
   char buf_[kWritableFileBufferSize];
@@ -465,24 +297,23 @@ class PosixWritableFile final : public WritableFile {
 };
 
 int LockOrUnlock(int fd, bool lock) {
-  errno = 0;
-  struct ::flock file_lock_info;
-  std::memset(&file_lock_info, 0, sizeof(file_lock_info));
-  file_lock_info.l_type = (lock ? F_WRLCK : F_UNLCK);
-  file_lock_info.l_whence = SEEK_SET;
-  file_lock_info.l_start = 0;
-  file_lock_info.l_len = 0;  // Lock/unlock entire file.
-  return ::fcntl(fd, F_SETLK, &file_lock_info);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 // Instances are thread-safe because they are immutable.
 class PosixFileLock : public FileLock {
  public:
   PosixFileLock(int fd, std::string filename)
-      : fd_(fd), filename_(std::move(filename)) {}
+      : fd_(fd), filename_(std::move(filename)) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-  int fd() const { return fd_; }
-  const std::string& filename() const { return filename_; }
+  int fd() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
+  const std::string& filename() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
   const int fd_;
@@ -499,16 +330,11 @@ class PosixFileLock : public FileLock {
 class PosixLockTable {
  public:
   bool Insert(const std::string& fname) LOCKS_EXCLUDED(mu_) {
-    mu_.Lock();
-    bool succeeded = locked_files_.insert(fname).second;
-    mu_.Unlock();
-    return succeeded;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
   void Remove(const std::string& fname) LOCKS_EXCLUDED(mu_) {
-    mu_.Lock();
-    locked_files_.erase(fname);
-    mu_.Unlock();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
   port::Mutex mu_;
@@ -527,229 +353,91 @@ class PosixEnv : public Env {
 
   Status NewSequentialFile(const std::string& filename,
                            SequentialFile** result) override {
-    int fd = ::open(filename.c_str(), O_RDONLY | kOpenBaseFlags);
-    if (fd < 0) {
-      *result = nullptr;
-      return PosixError(filename, errno);
-    }
-
-    *result = new PosixSequentialFile(filename, fd);
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status NewRandomAccessFile(const std::string& filename,
                              RandomAccessFile** result) override {
-    *result = nullptr;
-    int fd = ::open(filename.c_str(), O_RDONLY | kOpenBaseFlags);
-    if (fd < 0) {
-      return PosixError(filename, errno);
-    }
-
-    if (!mmap_limiter_.Acquire()) {
-      *result = new PosixRandomAccessFile(filename, fd, &fd_limiter_);
-      return Status::OK();
-    }
-
-    uint64_t file_size;
-    Status status = GetFileSize(filename, &file_size);
-    if (status.ok()) {
-      void* mmap_base =
-          ::mmap(/*addr=*/nullptr, file_size, PROT_READ, MAP_SHARED, fd, 0);
-      if (mmap_base != MAP_FAILED) {
-        *result = new PosixMmapReadableFile(filename,
-                                            reinterpret_cast<char*>(mmap_base),
-                                            file_size, &mmap_limiter_);
-      } else {
-        status = PosixError(filename, errno);
-      }
-    }
-    ::close(fd);
-    if (!status.ok()) {
-      mmap_limiter_.Release();
-    }
-    return status;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status NewWritableFile(const std::string& filename,
                          WritableFile** result) override {
-    int fd = ::open(filename.c_str(),
-                    O_TRUNC | O_WRONLY | O_CREAT | kOpenBaseFlags, 0644);
-    if (fd < 0) {
-      *result = nullptr;
-      return PosixError(filename, errno);
-    }
-
-    *result = new PosixWritableFile(filename, fd);
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status NewAppendableFile(const std::string& filename,
                            WritableFile** result) override {
-    int fd = ::open(filename.c_str(),
-                    O_APPEND | O_WRONLY | O_CREAT | kOpenBaseFlags, 0644);
-    if (fd < 0) {
-      *result = nullptr;
-      return PosixError(filename, errno);
-    }
-
-    *result = new PosixWritableFile(filename, fd);
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   bool FileExists(const std::string& filename) override {
-    return ::access(filename.c_str(), F_OK) == 0;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status GetChildren(const std::string& directory_path,
                      std::vector<std::string>* result) override {
-    result->clear();
-    ::DIR* dir = ::opendir(directory_path.c_str());
-    if (dir == nullptr) {
-      return PosixError(directory_path, errno);
-    }
-    struct ::dirent* entry;
-    while ((entry = ::readdir(dir)) != nullptr) {
-      result->emplace_back(entry->d_name);
-    }
-    ::closedir(dir);
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status RemoveFile(const std::string& filename) override {
-    if (::unlink(filename.c_str()) != 0) {
-      return PosixError(filename, errno);
-    }
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status CreateDir(const std::string& dirname) override {
-    if (::mkdir(dirname.c_str(), 0755) != 0) {
-      return PosixError(dirname, errno);
-    }
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status RemoveDir(const std::string& dirname) override {
-    if (::rmdir(dirname.c_str()) != 0) {
-      return PosixError(dirname, errno);
-    }
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status GetFileSize(const std::string& filename, uint64_t* size) override {
-    struct ::stat file_stat;
-    if (::stat(filename.c_str(), &file_stat) != 0) {
-      *size = 0;
-      return PosixError(filename, errno);
-    }
-    *size = file_stat.st_size;
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status RenameFile(const std::string& from, const std::string& to) override {
-    if (std::rename(from.c_str(), to.c_str()) != 0) {
-      return PosixError(from, errno);
-    }
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status LockFile(const std::string& filename, FileLock** lock) override {
-    *lock = nullptr;
-
-    int fd = ::open(filename.c_str(), O_RDWR | O_CREAT | kOpenBaseFlags, 0644);
-    if (fd < 0) {
-      return PosixError(filename, errno);
-    }
-
-    if (!locks_.Insert(filename)) {
-      ::close(fd);
-      return Status::IOError("lock " + filename, "already held by process");
-    }
-
-    if (LockOrUnlock(fd, true) == -1) {
-      int lock_errno = errno;
-      ::close(fd);
-      locks_.Remove(filename);
-      return PosixError("lock " + filename, lock_errno);
-    }
-
-    *lock = new PosixFileLock(fd, filename);
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status UnlockFile(FileLock* lock) override {
-    PosixFileLock* posix_file_lock = static_cast<PosixFileLock*>(lock);
-    if (LockOrUnlock(posix_file_lock->fd(), false) == -1) {
-      return PosixError("unlock " + posix_file_lock->filename(), errno);
-    }
-    locks_.Remove(posix_file_lock->filename());
-    ::close(posix_file_lock->fd());
-    delete posix_file_lock;
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   void Schedule(void (*background_work_function)(void* background_work_arg),
                 void* background_work_arg) override;
 
   void StartThread(void (*thread_main)(void* thread_main_arg),
                    void* thread_main_arg) override {
-    std::thread new_thread(thread_main, thread_main_arg);
-    new_thread.detach();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status GetTestDirectory(std::string* result) override {
-    const char* env = std::getenv("TEST_TMPDIR");
-    if (env && env[0] != '\0') {
-      *result = env;
-    } else {
-      char buf[100];
-      std::snprintf(buf, sizeof(buf), "/tmp/leveldbtest-%d",
-                    static_cast<int>(::geteuid()));
-      *result = buf;
-    }
-
-    // The CreateDir status is ignored because the directory may already exist.
-    CreateDir(*result);
-
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status NewLogger(const std::string& filename, Logger** result) override {
-    int fd = ::open(filename.c_str(),
-                    O_APPEND | O_WRONLY | O_CREAT | kOpenBaseFlags, 0644);
-    if (fd < 0) {
-      *result = nullptr;
-      return PosixError(filename, errno);
-    }
-
-    std::FILE* fp = ::fdopen(fd, "w");
-    if (fp == nullptr) {
-      ::close(fd);
-      *result = nullptr;
-      return PosixError(filename, errno);
-    } else {
-      *result = new PosixLogger(fp);
-      return Status::OK();
-    }
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   uint64_t NowMicros() override {
-    static constexpr uint64_t kUsecondsPerSecond = 1000000;
-    struct ::timeval tv;
-    ::gettimeofday(&tv, nullptr);
-    return static_cast<uint64_t>(tv.tv_sec) * kUsecondsPerSecond + tv.tv_usec;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   void SleepForMicroseconds(int micros) override {
-    std::this_thread::sleep_for(std::chrono::microseconds(micros));
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
   void BackgroundThreadMain();
 
   static void BackgroundThreadEntryPoint(PosixEnv* env) {
-    env->BackgroundThreadMain();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Stores the work item data in a Schedule() call.
   //
@@ -759,7 +447,9 @@ class PosixEnv : public Env {
   // This structure is thread-safe because it is immutable.
   struct BackgroundWorkItem {
     explicit BackgroundWorkItem(void (*function)(void* arg), void* arg)
-        : function(function), arg(arg) {}
+        : function(function), arg(arg) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
     void (*const function)(void*);
     void* const arg;
@@ -778,29 +468,13 @@ class PosixEnv : public Env {
 };
 
 // Return the maximum number of concurrent mmaps.
-int MaxMmaps() { return g_mmap_limit; }
+int MaxMmaps() {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
 // Return the maximum number of read-only files to keep open.
 int MaxOpenFiles() {
-  if (g_open_read_only_file_limit >= 0) {
-    return g_open_read_only_file_limit;
-  }
-#ifdef __Fuchsia__
-  // Fuchsia doesn't implement getrlimit.
-  g_open_read_only_file_limit = 50;
-#else
-  struct ::rlimit rlim;
-  if (::getrlimit(RLIMIT_NOFILE, &rlim)) {
-    // getrlimit failed, fallback to hard-coded default.
-    g_open_read_only_file_limit = 50;
-  } else if (rlim.rlim_cur == RLIM_INFINITY) {
-    g_open_read_only_file_limit = std::numeric_limits<int>::max();
-  } else {
-    // Allow use of 20% of available file descriptors for read-only files.
-    g_open_read_only_file_limit = rlim.rlim_cur / 5;
-  }
-#endif
-  return g_open_read_only_file_limit;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 }  // namespace
@@ -809,46 +483,18 @@ PosixEnv::PosixEnv()
     : background_work_cv_(&background_work_mutex_),
       started_background_thread_(false),
       mmap_limiter_(MaxMmaps()),
-      fd_limiter_(MaxOpenFiles()) {}
+      fd_limiter_(MaxOpenFiles()) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
 void PosixEnv::Schedule(
     void (*background_work_function)(void* background_work_arg),
     void* background_work_arg) {
-  background_work_mutex_.Lock();
-
-  // Start the background thread, if we haven't done so already.
-  if (!started_background_thread_) {
-    started_background_thread_ = true;
-    std::thread background_thread(PosixEnv::BackgroundThreadEntryPoint, this);
-    background_thread.detach();
-  }
-
-  // If the queue is empty, the background thread may be waiting for work.
-  if (background_work_queue_.empty()) {
-    background_work_cv_.Signal();
-  }
-
-  background_work_queue_.emplace(background_work_function, background_work_arg);
-  background_work_mutex_.Unlock();
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void PosixEnv::BackgroundThreadMain() {
-  while (true) {
-    background_work_mutex_.Lock();
-
-    // Wait until there is work to be done.
-    while (background_work_queue_.empty()) {
-      background_work_cv_.Wait();
-    }
-
-    assert(!background_work_queue_.empty());
-    auto background_work_function = background_work_queue_.front().function;
-    void* background_work_arg = background_work_queue_.front().arg;
-    background_work_queue_.pop();
-
-    background_work_mutex_.Unlock();
-    background_work_function(background_work_arg);
-  }
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 namespace {
@@ -869,31 +515,20 @@ template <typename EnvType>
 class SingletonEnv {
  public:
   SingletonEnv() {
-#if !defined(NDEBUG)
-    env_initialized_.store(true, std::memory_order_relaxed);
-#endif  // !defined(NDEBUG)
-    static_assert(sizeof(env_storage_) >= sizeof(EnvType),
-                  "env_storage_ will not fit the Env");
-    static_assert(std::is_standard_layout_v<SingletonEnv<EnvType>>);
-    static_assert(
-        offsetof(SingletonEnv<EnvType>, env_storage_) % alignof(EnvType) == 0,
-        "env_storage_ does not meet the Env's alignment needs");
-    static_assert(alignof(SingletonEnv<EnvType>) % alignof(EnvType) == 0,
-                  "env_storage_ does not meet the Env's alignment needs");
-    new (env_storage_) EnvType();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
   ~SingletonEnv() = default;
 
   SingletonEnv(const SingletonEnv&) = delete;
   SingletonEnv& operator=(const SingletonEnv&) = delete;
 
-  Env* env() { return reinterpret_cast<Env*>(&env_storage_); }
+  Env* env() {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   static void AssertEnvNotInitialized() {
-#if !defined(NDEBUG)
-    assert(!env_initialized_.load(std::memory_order_relaxed));
-#endif  // !defined(NDEBUG)
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
   alignas(EnvType) char env_storage_[sizeof(EnvType)];
@@ -912,18 +547,15 @@ using PosixDefaultEnv = SingletonEnv<PosixEnv>;
 }  // namespace
 
 void EnvPosixTestHelper::SetReadOnlyFDLimit(int limit) {
-  PosixDefaultEnv::AssertEnvNotInitialized();
-  g_open_read_only_file_limit = limit;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void EnvPosixTestHelper::SetReadOnlyMMapLimit(int limit) {
-  PosixDefaultEnv::AssertEnvNotInitialized();
-  g_mmap_limit = limit;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 Env* Env::Default() {
-  static PosixDefaultEnv env_container;
-  return env_container.env();
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 }  // namespace leveldb

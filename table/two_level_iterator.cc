@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -28,30 +30,23 @@ class TwoLevelIterator : public Iterator {
   void Next() override;
   void Prev() override;
 
-  bool Valid() const override { return data_iter_.Valid(); }
+  bool Valid() const override {
+    __builtin_trap() /* STUB: not implemented */;
+}
   Slice key() const override {
-    assert(Valid());
-    return data_iter_.key();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
   Slice value() const override {
-    assert(Valid());
-    return data_iter_.value();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
   Status status() const override {
-    // It'd be nice if status() returned a const Status& instead of a Status
-    if (!index_iter_.status().ok()) {
-      return index_iter_.status();
-    } else if (data_iter_.iter() != nullptr && !data_iter_.status().ok()) {
-      return data_iter_.status();
-    } else {
-      return status_;
-    }
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
   void SaveError(const Status& s) {
-    if (status_.ok() && !s.ok()) status_ = s;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
   void SkipEmptyDataBlocksForward();
   void SkipEmptyDataBlocksBackward();
   void SetDataIterator(Iterator* data_iter);
@@ -75,89 +70,46 @@ TwoLevelIterator::TwoLevelIterator(Iterator* index_iter,
       arg_(arg),
       options_(options),
       index_iter_(index_iter),
-      data_iter_(nullptr) {}
+      data_iter_(nullptr) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
 TwoLevelIterator::~TwoLevelIterator() = default;
 
 void TwoLevelIterator::Seek(const Slice& target) {
-  index_iter_.Seek(target);
-  InitDataBlock();
-  if (data_iter_.iter() != nullptr) data_iter_.Seek(target);
-  SkipEmptyDataBlocksForward();
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void TwoLevelIterator::SeekToFirst() {
-  index_iter_.SeekToFirst();
-  InitDataBlock();
-  if (data_iter_.iter() != nullptr) data_iter_.SeekToFirst();
-  SkipEmptyDataBlocksForward();
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void TwoLevelIterator::SeekToLast() {
-  index_iter_.SeekToLast();
-  InitDataBlock();
-  if (data_iter_.iter() != nullptr) data_iter_.SeekToLast();
-  SkipEmptyDataBlocksBackward();
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void TwoLevelIterator::Next() {
-  assert(Valid());
-  data_iter_.Next();
-  SkipEmptyDataBlocksForward();
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void TwoLevelIterator::Prev() {
-  assert(Valid());
-  data_iter_.Prev();
-  SkipEmptyDataBlocksBackward();
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void TwoLevelIterator::SkipEmptyDataBlocksForward() {
-  while (data_iter_.iter() == nullptr || !data_iter_.Valid()) {
-    // Move to next block
-    if (!index_iter_.Valid()) {
-      SetDataIterator(nullptr);
-      return;
-    }
-    index_iter_.Next();
-    InitDataBlock();
-    if (data_iter_.iter() != nullptr) data_iter_.SeekToFirst();
-  }
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void TwoLevelIterator::SkipEmptyDataBlocksBackward() {
-  while (data_iter_.iter() == nullptr || !data_iter_.Valid()) {
-    // Move to next block
-    if (!index_iter_.Valid()) {
-      SetDataIterator(nullptr);
-      return;
-    }
-    index_iter_.Prev();
-    InitDataBlock();
-    if (data_iter_.iter() != nullptr) data_iter_.SeekToLast();
-  }
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void TwoLevelIterator::SetDataIterator(Iterator* data_iter) {
-  if (data_iter_.iter() != nullptr) SaveError(data_iter_.status());
-  data_iter_.Set(data_iter);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 void TwoLevelIterator::InitDataBlock() {
-  if (!index_iter_.Valid()) {
-    SetDataIterator(nullptr);
-  } else {
-    Slice handle = index_iter_.value();
-    if (data_iter_.iter() != nullptr &&
-        handle.compare(data_block_handle_) == 0) {
-      // data_iter_ is already constructed with this iterator, so
-      // no need to change anything
-    } else {
-      Iterator* iter = (*block_function_)(arg_, options_, handle);
-      data_block_handle_.assign(handle.data(), handle.size());
-      SetDataIterator(iter);
-    }
-  }
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 }  // namespace
@@ -165,7 +117,7 @@ void TwoLevelIterator::InitDataBlock() {
 Iterator* NewTwoLevelIterator(Iterator* index_iter,
                               BlockFunction block_function, void* arg,
                               const ReadOptions& options) {
-  return new TwoLevelIterator(index_iter, block_function, arg, options);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 }  // namespace leveldb

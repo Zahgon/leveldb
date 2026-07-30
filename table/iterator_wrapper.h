@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -16,71 +18,57 @@ namespace leveldb {
 // cache locality.
 class IteratorWrapper {
  public:
-  IteratorWrapper() : iter_(nullptr), valid_(false) {}
-  explicit IteratorWrapper(Iterator* iter) : iter_(nullptr) { Set(iter); }
+  IteratorWrapper() : iter_(nullptr), valid_(false) {
+    __builtin_trap() /* STUB: not implemented */;
+}
+  explicit IteratorWrapper(Iterator* iter) : iter_(nullptr) {
+    __builtin_trap() /* STUB: not implemented */;
+}
   ~IteratorWrapper() { delete iter_; }
-  Iterator* iter() const { return iter_; }
+  Iterator* iter() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Takes ownership of "iter" and will delete it when destroyed, or
   // when Set() is invoked again.
   void Set(Iterator* iter) {
-    delete iter_;
-    iter_ = iter;
-    if (iter_ == nullptr) {
-      valid_ = false;
-    } else {
-      Update();
-    }
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Iterator interface methods
-  bool Valid() const { return valid_; }
+  bool Valid() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
   Slice key() const {
-    assert(Valid());
-    return key_;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
   Slice value() const {
-    assert(Valid());
-    return iter_->value();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
   // Methods below require iter() != nullptr
   Status status() const {
-    assert(iter_);
-    return iter_->status();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
   void Next() {
-    assert(iter_);
-    iter_->Next();
-    Update();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
   void Prev() {
-    assert(iter_);
-    iter_->Prev();
-    Update();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
   void Seek(const Slice& k) {
-    assert(iter_);
-    iter_->Seek(k);
-    Update();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
   void SeekToFirst() {
-    assert(iter_);
-    iter_->SeekToFirst();
-    Update();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
   void SeekToLast() {
-    assert(iter_);
-    iter_->SeekToLast();
-    Update();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
   void Update() {
-    valid_ = iter_->Valid();
-    if (valid_) {
-      key_ = iter_->key();
-    }
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Iterator* iter_;
   bool valid_;

@@ -6,6 +6,6 @@
 
 namespace leveldb {
 
-FilterPolicy::~FilterPolicy() {}
+FilterPolicy::~FilterPolicy() { __builtin_trap() /* STUB: not implemented */; }
 
 }  // namespace leveldb

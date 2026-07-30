@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -611,139 +613,43 @@ class Harness : public testing::Test {
 
 // Test empty table/block.
 TEST_F(Harness, Empty) {
-  for (int i = 0; i < kNumTestArgs; i++) {
-    Init(kTestArgList[i]);
-    Random rnd(test::RandomSeed() + 1);
-    Test(&rnd);
-  }
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 // Special test for a block with no restart entries.  The C++ leveldb
 // code never generates such blocks, but the Java version of leveldb
 // seems to.
 TEST_F(Harness, ZeroRestartPointsInBlock) {
-  char data[sizeof(uint32_t)];
-  memset(data, 0, sizeof(data));
-  BlockContents contents;
-  contents.data = Slice(data, sizeof(data));
-  contents.cachable = false;
-  contents.heap_allocated = false;
-  Block block(contents);
-  Iterator* iter = block.NewIterator(BytewiseComparator());
-  iter->SeekToFirst();
-  ASSERT_TRUE(!iter->Valid());
-  iter->SeekToLast();
-  ASSERT_TRUE(!iter->Valid());
-  iter->Seek("foo");
-  ASSERT_TRUE(!iter->Valid());
-  delete iter;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 // Test the empty key
 TEST_F(Harness, SimpleEmptyKey) {
-  for (int i = 0; i < kNumTestArgs; i++) {
-    Init(kTestArgList[i]);
-    Random rnd(test::RandomSeed() + 1);
-    Add("", "v");
-    Test(&rnd);
-  }
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(Harness, SimpleSingle) {
-  for (int i = 0; i < kNumTestArgs; i++) {
-    Init(kTestArgList[i]);
-    Random rnd(test::RandomSeed() + 2);
-    Add("abc", "v");
-    Test(&rnd);
-  }
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(Harness, SimpleMulti) {
-  for (int i = 0; i < kNumTestArgs; i++) {
-    Init(kTestArgList[i]);
-    Random rnd(test::RandomSeed() + 3);
-    Add("abc", "v");
-    Add("abcd", "v");
-    Add("ac", "v2");
-    Test(&rnd);
-  }
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(Harness, SimpleSpecialKey) {
-  for (int i = 0; i < kNumTestArgs; i++) {
-    Init(kTestArgList[i]);
-    Random rnd(test::RandomSeed() + 4);
-    Add("\xff\xff", "v3");
-    Test(&rnd);
-  }
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(Harness, Randomized) {
-  for (int i = 0; i < kNumTestArgs; i++) {
-    Init(kTestArgList[i]);
-    Random rnd(test::RandomSeed() + 5);
-    for (int num_entries = 0; num_entries < 2000;
-         num_entries += (num_entries < 50 ? 1 : 200)) {
-      if ((num_entries % 10) == 0) {
-        std::fprintf(stderr, "case %d of %d: num_entries = %d\n", (i + 1),
-                     int(kNumTestArgs), num_entries);
-      }
-      for (int e = 0; e < num_entries; e++) {
-        std::string v;
-        Add(test::RandomKey(&rnd, rnd.Skewed(4)),
-            test::RandomString(&rnd, rnd.Skewed(5), &v).ToString());
-      }
-      Test(&rnd);
-    }
-  }
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(Harness, RandomizedLongDB) {
-  Random rnd(test::RandomSeed());
-  TestArgs args = {DB_TEST, false, 16};
-  Init(args);
-  int num_entries = 100000;
-  for (int e = 0; e < num_entries; e++) {
-    std::string v;
-    Add(test::RandomKey(&rnd, rnd.Skewed(4)),
-        test::RandomString(&rnd, rnd.Skewed(5), &v).ToString());
-  }
-  Test(&rnd);
-
-  // We must have created enough data to force merging
-  int files = 0;
-  for (int level = 0; level < config::kNumLevels; level++) {
-    std::string value;
-    char name[100];
-    std::snprintf(name, sizeof(name), "leveldb.num-files-at-level%d", level);
-    ASSERT_TRUE(db()->GetProperty(name, &value));
-    files += atoi(value.c_str());
-  }
-  ASSERT_GT(files, 0);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST(MemTableTest, Simple) {
-  InternalKeyComparator cmp(BytewiseComparator());
-  MemTable* memtable = new MemTable(cmp);
-  memtable->Ref();
-  WriteBatch batch;
-  WriteBatchInternal::SetSequence(&batch, 100);
-  batch.Put(std::string("k1"), std::string("v1"));
-  batch.Put(std::string("k2"), std::string("v2"));
-  batch.Put(std::string("k3"), std::string("v3"));
-  batch.Put(std::string("largekey"), std::string("vlarge"));
-  ASSERT_TRUE(WriteBatchInternal::InsertInto(&batch, memtable).ok());
-
-  Iterator* iter = memtable->NewIterator();
-  iter->SeekToFirst();
-  while (iter->Valid()) {
-    std::fprintf(stderr, "key: '%s' -> '%s'\n", iter->key().ToString().c_str(),
-                 iter->value().ToString().c_str());
-    iter->Next();
-  }
-
-  delete iter;
-  memtable->Unref();
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 static bool Between(uint64_t val, uint64_t low, uint64_t high) {
@@ -757,32 +663,7 @@ static bool Between(uint64_t val, uint64_t low, uint64_t high) {
 }
 
 TEST(TableTest, ApproximateOffsetOfPlain) {
-  TableConstructor c(BytewiseComparator());
-  c.Add("k01", "hello");
-  c.Add("k02", "hello2");
-  c.Add("k03", std::string(10000, 'x'));
-  c.Add("k04", std::string(200000, 'x'));
-  c.Add("k05", std::string(300000, 'x'));
-  c.Add("k06", "hello3");
-  c.Add("k07", std::string(100000, 'x'));
-  std::vector<std::string> keys;
-  KVMap kvmap;
-  Options options;
-  options.block_size = 1024;
-  options.compression = kNoCompression;
-  c.Finish(options, &keys, &kvmap);
-
-  ASSERT_TRUE(Between(c.ApproximateOffsetOf("abc"), 0, 0));
-  ASSERT_TRUE(Between(c.ApproximateOffsetOf("k01"), 0, 0));
-  ASSERT_TRUE(Between(c.ApproximateOffsetOf("k01a"), 0, 0));
-  ASSERT_TRUE(Between(c.ApproximateOffsetOf("k02"), 0, 0));
-  ASSERT_TRUE(Between(c.ApproximateOffsetOf("k03"), 0, 0));
-  ASSERT_TRUE(Between(c.ApproximateOffsetOf("k04"), 10000, 11000));
-  ASSERT_TRUE(Between(c.ApproximateOffsetOf("k04a"), 210000, 211000));
-  ASSERT_TRUE(Between(c.ApproximateOffsetOf("k05"), 210000, 211000));
-  ASSERT_TRUE(Between(c.ApproximateOffsetOf("k06"), 510000, 511000));
-  ASSERT_TRUE(Between(c.ApproximateOffsetOf("k07"), 510000, 511000));
-  ASSERT_TRUE(Between(c.ApproximateOffsetOf("xyz"), 610000, 612000));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 static bool CompressionSupported(CompressionType type) {

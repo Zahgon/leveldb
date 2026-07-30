@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -71,15 +73,19 @@ struct ParsedInternalKey {
   SequenceNumber sequence;
   ValueType type;
 
-  ParsedInternalKey() {}  // Intentionally left uninitialized (for speed)
+  ParsedInternalKey() {
+    __builtin_trap() /* STUB: not implemented */;
+}  // Intentionally left uninitialized (for speed)
   ParsedInternalKey(const Slice& u, const SequenceNumber& seq, ValueType t)
-      : user_key(u), sequence(seq), type(t) {}
+      : user_key(u), sequence(seq), type(t) {
+    __builtin_trap() /* STUB: not implemented */;
+}
   std::string DebugString() const;
 };
 
 // Return the length of the encoding of "key".
 inline size_t InternalKeyEncodingLength(const ParsedInternalKey& key) {
-  return key.user_key.size() + 8;
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 // Append the serialization of "key" to *result.
@@ -93,8 +99,7 @@ bool ParseInternalKey(const Slice& internal_key, ParsedInternalKey* result);
 
 // Returns the user key portion of an internal key.
 inline Slice ExtractUserKey(const Slice& internal_key) {
-  assert(internal_key.size() >= 8);
-  return Slice(internal_key.data(), internal_key.size() - 8);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 // A comparator for internal keys that uses a specified comparator for
@@ -104,14 +109,18 @@ class InternalKeyComparator : public Comparator {
   const Comparator* user_comparator_;
 
  public:
-  explicit InternalKeyComparator(const Comparator* c) : user_comparator_(c) {}
+  explicit InternalKeyComparator(const Comparator* c) : user_comparator_(c) {
+    __builtin_trap() /* STUB: not implemented */;
+}
   const char* Name() const override;
   int Compare(const Slice& a, const Slice& b) const override;
   void FindShortestSeparator(std::string* start,
                              const Slice& limit) const override;
   void FindShortSuccessor(std::string* key) const override;
 
-  const Comparator* user_comparator() const { return user_comparator_; }
+  const Comparator* user_comparator() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   int Compare(const InternalKey& a, const InternalKey& b) const;
 };
@@ -122,7 +131,9 @@ class InternalFilterPolicy : public FilterPolicy {
   const FilterPolicy* const user_policy_;
 
  public:
-  explicit InternalFilterPolicy(const FilterPolicy* p) : user_policy_(p) {}
+  explicit InternalFilterPolicy(const FilterPolicy* p) : user_policy_(p) {
+    __builtin_trap() /* STUB: not implemented */;
+}
   const char* Name() const override;
   void CreateFilter(const Slice* keys, int n, std::string* dst) const override;
   bool KeyMayMatch(const Slice& key, const Slice& filter) const override;
@@ -136,48 +147,44 @@ class InternalKey {
   std::string rep_;
 
  public:
-  InternalKey() {}  // Leave rep_ as empty to indicate it is invalid
+  InternalKey() {
+    __builtin_trap() /* STUB: not implemented */;
+}  // Leave rep_ as empty to indicate it is invalid
   InternalKey(const Slice& user_key, SequenceNumber s, ValueType t) {
-    AppendInternalKey(&rep_, ParsedInternalKey(user_key, s, t));
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   bool DecodeFrom(const Slice& s) {
-    rep_.assign(s.data(), s.size());
-    return !rep_.empty();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Slice Encode() const {
-    assert(!rep_.empty());
-    return rep_;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-  Slice user_key() const { return ExtractUserKey(rep_); }
+  Slice user_key() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   void SetFrom(const ParsedInternalKey& p) {
-    rep_.clear();
-    AppendInternalKey(&rep_, p);
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-  void Clear() { rep_.clear(); }
+  void Clear() {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   std::string DebugString() const;
 };
 
 inline int InternalKeyComparator::Compare(const InternalKey& a,
                                           const InternalKey& b) const {
-  return Compare(a.Encode(), b.Encode());
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 inline bool ParseInternalKey(const Slice& internal_key,
                              ParsedInternalKey* result) {
-  const size_t n = internal_key.size();
-  if (n < 8) return false;
-  uint64_t num = DecodeFixed64(internal_key.data() + n - 8);
-  uint8_t c = num & 0xff;
-  result->sequence = num >> 8;
-  result->type = static_cast<ValueType>(c);
-  result->user_key = Slice(internal_key.data(), n - 8);
-  return (c <= static_cast<uint8_t>(kTypeValue));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 // A helper class useful for DBImpl::Get()
@@ -193,13 +200,19 @@ class LookupKey {
   ~LookupKey();
 
   // Return a key suitable for lookup in a MemTable.
-  Slice memtable_key() const { return Slice(start_, end_ - start_); }
+  Slice memtable_key() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Return an internal key (suitable for passing to an internal iterator)
-  Slice internal_key() const { return Slice(kstart_, end_ - kstart_); }
+  Slice internal_key() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Return the user key
-  Slice user_key() const { return Slice(kstart_, end_ - kstart_ - 8); }
+  Slice user_key() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
   // We construct a char array of the form:

@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -33,96 +35,11 @@ struct Comparator {
 };
 
 TEST(SkipTest, Empty) {
-  Arena arena;
-  Comparator cmp;
-  SkipList<Key, Comparator> list(cmp, &arena);
-  ASSERT_TRUE(!list.Contains(10));
-
-  SkipList<Key, Comparator>::Iterator iter(&list);
-  ASSERT_TRUE(!iter.Valid());
-  iter.SeekToFirst();
-  ASSERT_TRUE(!iter.Valid());
-  iter.Seek(100);
-  ASSERT_TRUE(!iter.Valid());
-  iter.SeekToLast();
-  ASSERT_TRUE(!iter.Valid());
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST(SkipTest, InsertAndLookup) {
-  const int N = 2000;
-  const int R = 5000;
-  Random rnd(1000);
-  std::set<Key> keys;
-  Arena arena;
-  Comparator cmp;
-  SkipList<Key, Comparator> list(cmp, &arena);
-  for (int i = 0; i < N; i++) {
-    Key key = rnd.Next() % R;
-    if (keys.insert(key).second) {
-      list.Insert(key);
-    }
-  }
-
-  for (int i = 0; i < R; i++) {
-    if (list.Contains(i)) {
-      ASSERT_EQ(keys.count(i), 1);
-    } else {
-      ASSERT_EQ(keys.count(i), 0);
-    }
-  }
-
-  // Simple iterator tests
-  {
-    SkipList<Key, Comparator>::Iterator iter(&list);
-    ASSERT_TRUE(!iter.Valid());
-
-    iter.Seek(0);
-    ASSERT_TRUE(iter.Valid());
-    ASSERT_EQ(*(keys.begin()), iter.key());
-
-    iter.SeekToFirst();
-    ASSERT_TRUE(iter.Valid());
-    ASSERT_EQ(*(keys.begin()), iter.key());
-
-    iter.SeekToLast();
-    ASSERT_TRUE(iter.Valid());
-    ASSERT_EQ(*(keys.rbegin()), iter.key());
-  }
-
-  // Forward iteration test
-  for (int i = 0; i < R; i++) {
-    SkipList<Key, Comparator>::Iterator iter(&list);
-    iter.Seek(i);
-
-    // Compare against model iterator
-    std::set<Key>::iterator model_iter = keys.lower_bound(i);
-    for (int j = 0; j < 3; j++) {
-      if (model_iter == keys.end()) {
-        ASSERT_TRUE(!iter.Valid());
-        break;
-      } else {
-        ASSERT_TRUE(iter.Valid());
-        ASSERT_EQ(*model_iter, iter.key());
-        ++model_iter;
-        iter.Next();
-      }
-    }
-  }
-
-  // Backward iteration test
-  {
-    SkipList<Key, Comparator>::Iterator iter(&list);
-    iter.SeekToLast();
-
-    // Compare against model iterator
-    for (std::set<Key>::reverse_iterator model_iter = keys.rbegin();
-         model_iter != keys.rend(); ++model_iter) {
-      ASSERT_TRUE(iter.Valid());
-      ASSERT_EQ(*model_iter, iter.key());
-      iter.Prev();
-    }
-    ASSERT_TRUE(!iter.Valid());
-  }
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 // We want to make sure that with a single writer and multiple
@@ -287,12 +204,7 @@ constexpr uint32_t ConcurrentTest::K;
 // Simple test that does single-threaded testing of the ConcurrentTest
 // scaffolding.
 TEST(SkipTest, ConcurrentWithoutThreads) {
-  ConcurrentTest test;
-  Random rnd(test::RandomSeed());
-  for (int i = 0; i < 10000; i++) {
-    test.ReadStep(&rnd);
-    test.WriteStep(&rnd);
-  }
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 class TestState {
@@ -359,10 +271,20 @@ static void RunConcurrent(int run) {
   }
 }
 
-TEST(SkipTest, Concurrent1) { RunConcurrent(1); }
-TEST(SkipTest, Concurrent2) { RunConcurrent(2); }
-TEST(SkipTest, Concurrent3) { RunConcurrent(3); }
-TEST(SkipTest, Concurrent4) { RunConcurrent(4); }
-TEST(SkipTest, Concurrent5) { RunConcurrent(5); }
+TEST(SkipTest, Concurrent1) {
+    __builtin_trap() /* STUB: not implemented */;
+}
+TEST(SkipTest, Concurrent2) {
+    __builtin_trap() /* STUB: not implemented */;
+}
+TEST(SkipTest, Concurrent3) {
+    __builtin_trap() /* STUB: not implemented */;
+}
+TEST(SkipTest, Concurrent4) {
+    __builtin_trap() /* STUB: not implemented */;
+}
+TEST(SkipTest, Concurrent5) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
 }  // namespace leveldb

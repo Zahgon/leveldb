@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -258,301 +260,159 @@ uint64_t LogTest::initial_offset_last_record_offsets_[] = {
 int LogTest::num_initial_offset_records_ =
     sizeof(LogTest::initial_offset_last_record_offsets_) / sizeof(uint64_t);
 
-TEST_F(LogTest, Empty) { ASSERT_EQ("EOF", Read()); }
+TEST_F(LogTest, Empty) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
 TEST_F(LogTest, ReadWrite) {
-  Write("foo");
-  Write("bar");
-  Write("");
-  Write("xxxx");
-  ASSERT_EQ("foo", Read());
-  ASSERT_EQ("bar", Read());
-  ASSERT_EQ("", Read());
-  ASSERT_EQ("xxxx", Read());
-  ASSERT_EQ("EOF", Read());
-  ASSERT_EQ("EOF", Read());  // Make sure reads at eof work
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, ManyBlocks) {
-  for (int i = 0; i < 100000; i++) {
-    Write(NumberString(i));
-  }
-  for (int i = 0; i < 100000; i++) {
-    ASSERT_EQ(NumberString(i), Read());
-  }
-  ASSERT_EQ("EOF", Read());
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, Fragmentation) {
-  Write("small");
-  Write(BigString("medium", 50000));
-  Write(BigString("large", 100000));
-  ASSERT_EQ("small", Read());
-  ASSERT_EQ(BigString("medium", 50000), Read());
-  ASSERT_EQ(BigString("large", 100000), Read());
-  ASSERT_EQ("EOF", Read());
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, MarginalTrailer) {
-  // Make a trailer that is exactly the same length as an empty record.
-  const int n = kBlockSize - 2 * kHeaderSize;
-  Write(BigString("foo", n));
-  ASSERT_EQ(kBlockSize - kHeaderSize, WrittenBytes());
-  Write("");
-  Write("bar");
-  ASSERT_EQ(BigString("foo", n), Read());
-  ASSERT_EQ("", Read());
-  ASSERT_EQ("bar", Read());
-  ASSERT_EQ("EOF", Read());
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, MarginalTrailer2) {
-  // Make a trailer that is exactly the same length as an empty record.
-  const int n = kBlockSize - 2 * kHeaderSize;
-  Write(BigString("foo", n));
-  ASSERT_EQ(kBlockSize - kHeaderSize, WrittenBytes());
-  Write("bar");
-  ASSERT_EQ(BigString("foo", n), Read());
-  ASSERT_EQ("bar", Read());
-  ASSERT_EQ("EOF", Read());
-  ASSERT_EQ(0, DroppedBytes());
-  ASSERT_EQ("", ReportMessage());
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, ShortTrailer) {
-  const int n = kBlockSize - 2 * kHeaderSize + 4;
-  Write(BigString("foo", n));
-  ASSERT_EQ(kBlockSize - kHeaderSize + 4, WrittenBytes());
-  Write("");
-  Write("bar");
-  ASSERT_EQ(BigString("foo", n), Read());
-  ASSERT_EQ("", Read());
-  ASSERT_EQ("bar", Read());
-  ASSERT_EQ("EOF", Read());
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, AlignedEof) {
-  const int n = kBlockSize - 2 * kHeaderSize + 4;
-  Write(BigString("foo", n));
-  ASSERT_EQ(kBlockSize - kHeaderSize + 4, WrittenBytes());
-  ASSERT_EQ(BigString("foo", n), Read());
-  ASSERT_EQ("EOF", Read());
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, OpenForAppend) {
-  Write("hello");
-  ReopenForAppend();
-  Write("world");
-  ASSERT_EQ("hello", Read());
-  ASSERT_EQ("world", Read());
-  ASSERT_EQ("EOF", Read());
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, RandomRead) {
-  const int N = 500;
-  Random write_rnd(301);
-  for (int i = 0; i < N; i++) {
-    Write(RandomSkewedString(i, &write_rnd));
-  }
-  Random read_rnd(301);
-  for (int i = 0; i < N; i++) {
-    ASSERT_EQ(RandomSkewedString(i, &read_rnd), Read());
-  }
-  ASSERT_EQ("EOF", Read());
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 // Tests of all the error paths in log_reader.cc follow:
 
 TEST_F(LogTest, ReadError) {
-  Write("foo");
-  ForceError();
-  ASSERT_EQ("EOF", Read());
-  ASSERT_EQ(kBlockSize, DroppedBytes());
-  ASSERT_EQ("OK", MatchError("read error"));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, BadRecordType) {
-  Write("foo");
-  // Type is stored in header[6]
-  IncrementByte(6, 100);
-  FixChecksum(0, 3);
-  ASSERT_EQ("EOF", Read());
-  ASSERT_EQ(3, DroppedBytes());
-  ASSERT_EQ("OK", MatchError("unknown record type"));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, TruncatedTrailingRecordIsIgnored) {
-  Write("foo");
-  ShrinkSize(4);  // Drop all payload as well as a header byte
-  ASSERT_EQ("EOF", Read());
-  // Truncated last record is ignored, not treated as an error.
-  ASSERT_EQ(0, DroppedBytes());
-  ASSERT_EQ("", ReportMessage());
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, BadLength) {
-  const int kPayloadSize = kBlockSize - kHeaderSize;
-  Write(BigString("bar", kPayloadSize));
-  Write("foo");
-  // Least significant size byte is stored in header[4].
-  IncrementByte(4, 1);
-  ASSERT_EQ("foo", Read());
-  ASSERT_EQ(kBlockSize, DroppedBytes());
-  ASSERT_EQ("OK", MatchError("bad record length"));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, BadLengthAtEndIsIgnored) {
-  Write("foo");
-  ShrinkSize(1);
-  ASSERT_EQ("EOF", Read());
-  ASSERT_EQ(0, DroppedBytes());
-  ASSERT_EQ("", ReportMessage());
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, ChecksumMismatch) {
-  Write("foo");
-  IncrementByte(0, 10);
-  ASSERT_EQ("EOF", Read());
-  ASSERT_EQ(10, DroppedBytes());
-  ASSERT_EQ("OK", MatchError("checksum mismatch"));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, UnexpectedMiddleType) {
-  Write("foo");
-  SetByte(6, kMiddleType);
-  FixChecksum(0, 3);
-  ASSERT_EQ("EOF", Read());
-  ASSERT_EQ(3, DroppedBytes());
-  ASSERT_EQ("OK", MatchError("missing start"));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, UnexpectedLastType) {
-  Write("foo");
-  SetByte(6, kLastType);
-  FixChecksum(0, 3);
-  ASSERT_EQ("EOF", Read());
-  ASSERT_EQ(3, DroppedBytes());
-  ASSERT_EQ("OK", MatchError("missing start"));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, UnexpectedFullType) {
-  Write("foo");
-  Write("bar");
-  SetByte(6, kFirstType);
-  FixChecksum(0, 3);
-  ASSERT_EQ("bar", Read());
-  ASSERT_EQ("EOF", Read());
-  ASSERT_EQ(3, DroppedBytes());
-  ASSERT_EQ("OK", MatchError("partial record without end"));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, UnexpectedFirstType) {
-  Write("foo");
-  Write(BigString("bar", 100000));
-  SetByte(6, kFirstType);
-  FixChecksum(0, 3);
-  ASSERT_EQ(BigString("bar", 100000), Read());
-  ASSERT_EQ("EOF", Read());
-  ASSERT_EQ(3, DroppedBytes());
-  ASSERT_EQ("OK", MatchError("partial record without end"));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, MissingLastIsIgnored) {
-  Write(BigString("bar", kBlockSize));
-  // Remove the LAST block, including header.
-  ShrinkSize(14);
-  ASSERT_EQ("EOF", Read());
-  ASSERT_EQ("", ReportMessage());
-  ASSERT_EQ(0, DroppedBytes());
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, PartialLastIsIgnored) {
-  Write(BigString("bar", kBlockSize));
-  // Cause a bad record length in the LAST block.
-  ShrinkSize(1);
-  ASSERT_EQ("EOF", Read());
-  ASSERT_EQ("", ReportMessage());
-  ASSERT_EQ(0, DroppedBytes());
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, SkipIntoMultiRecord) {
-  // Consider a fragmented record:
-  //    first(R1), middle(R1), last(R1), first(R2)
-  // If initial_offset points to a record after first(R1) but before first(R2)
-  // incomplete fragment errors are not actual errors, and must be suppressed
-  // until a new first or full record is encountered.
-  Write(BigString("foo", 3 * kBlockSize));
-  Write("correct");
-  StartReadingAt(kBlockSize);
-
-  ASSERT_EQ("correct", Read());
-  ASSERT_EQ("", ReportMessage());
-  ASSERT_EQ(0, DroppedBytes());
-  ASSERT_EQ("EOF", Read());
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, ErrorJoinsRecords) {
-  // Consider two fragmented records:
-  //    first(R1) last(R1) first(R2) last(R2)
-  // where the middle two fragments disappear.  We do not want
-  // first(R1),last(R2) to get joined and returned as a valid record.
-
-  // Write records that span two blocks
-  Write(BigString("foo", kBlockSize));
-  Write(BigString("bar", kBlockSize));
-  Write("correct");
-
-  // Wipe the middle block
-  for (int offset = kBlockSize; offset < 2 * kBlockSize; offset++) {
-    SetByte(offset, 'x');
-  }
-
-  ASSERT_EQ("correct", Read());
-  ASSERT_EQ("EOF", Read());
-  const size_t dropped = DroppedBytes();
-  ASSERT_LE(dropped, 2 * kBlockSize + 100);
-  ASSERT_GE(dropped, 2 * kBlockSize);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
-TEST_F(LogTest, ReadStart) { CheckInitialOffsetRecord(0, 0); }
+TEST_F(LogTest, ReadStart) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-TEST_F(LogTest, ReadSecondOneOff) { CheckInitialOffsetRecord(1, 1); }
+TEST_F(LogTest, ReadSecondOneOff) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-TEST_F(LogTest, ReadSecondTenThousand) { CheckInitialOffsetRecord(10000, 1); }
+TEST_F(LogTest, ReadSecondTenThousand) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-TEST_F(LogTest, ReadSecondStart) { CheckInitialOffsetRecord(10007, 1); }
+TEST_F(LogTest, ReadSecondStart) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-TEST_F(LogTest, ReadThirdOneOff) { CheckInitialOffsetRecord(10008, 2); }
+TEST_F(LogTest, ReadThirdOneOff) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-TEST_F(LogTest, ReadThirdStart) { CheckInitialOffsetRecord(20014, 2); }
+TEST_F(LogTest, ReadThirdStart) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-TEST_F(LogTest, ReadFourthOneOff) { CheckInitialOffsetRecord(20015, 3); }
+TEST_F(LogTest, ReadFourthOneOff) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
 TEST_F(LogTest, ReadFourthFirstBlockTrailer) {
-  CheckInitialOffsetRecord(log::kBlockSize - 4, 3);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, ReadFourthMiddleBlock) {
-  CheckInitialOffsetRecord(log::kBlockSize + 1, 3);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, ReadFourthLastBlock) {
-  CheckInitialOffsetRecord(2 * log::kBlockSize + 1, 3);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, ReadFourthStart) {
-  CheckInitialOffsetRecord(
-      2 * (kHeaderSize + 1000) + (2 * log::kBlockSize - 1000) + 3 * kHeaderSize,
-      3);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(LogTest, ReadInitialOffsetIntoBlockPadding) {
-  CheckInitialOffsetRecord(3 * log::kBlockSize - 3, 5);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
-TEST_F(LogTest, ReadEnd) { CheckOffsetPastEndReturnsNoRecords(0); }
+TEST_F(LogTest, ReadEnd) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-TEST_F(LogTest, ReadPastEnd) { CheckOffsetPastEndReturnsNoRecords(5); }
+TEST_F(LogTest, ReadPastEnd) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
 }  // namespace log
 }  // namespace leveldb

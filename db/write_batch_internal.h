@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -29,9 +31,13 @@ class WriteBatchInternal {
   // this batch.
   static void SetSequence(WriteBatch* batch, SequenceNumber seq);
 
-  static Slice Contents(const WriteBatch* batch) { return Slice(batch->rep_); }
+  static Slice Contents(const WriteBatch* batch) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-  static size_t ByteSize(const WriteBatch* batch) { return batch->rep_.size(); }
+  static size_t ByteSize(const WriteBatch* batch) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   static void SetContents(WriteBatch* batch, const Slice& contents);
 

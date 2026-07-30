@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -24,7 +26,9 @@ class FileState {
  public:
   // FileStates are reference counted. The initial reference count is zero
   // and the caller must call Ref() at least once.
-  FileState() : refs_(0), size_(0) {}
+  FileState() : refs_(0), size_(0) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // No copying allowed.
   FileState(const FileState&) = delete;
@@ -32,108 +36,29 @@ class FileState {
 
   // Increase the reference count.
   void Ref() {
-    MutexLock lock(&refs_mutex_);
-    ++refs_;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Decrease the reference count. Delete if this is the last reference.
   void Unref() {
-    bool do_delete = false;
-
-    {
-      MutexLock lock(&refs_mutex_);
-      --refs_;
-      assert(refs_ >= 0);
-      if (refs_ <= 0) {
-        do_delete = true;
-      }
-    }
-
-    if (do_delete) {
-      delete this;
-    }
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   uint64_t Size() const {
-    MutexLock lock(&blocks_mutex_);
-    return size_;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   void Truncate() {
-    MutexLock lock(&blocks_mutex_);
-    for (char*& block : blocks_) {
-      delete[] block;
-    }
-    blocks_.clear();
-    size_ = 0;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status Read(uint64_t offset, size_t n, Slice* result, char* scratch) const {
-    MutexLock lock(&blocks_mutex_);
-    if (offset > size_) {
-      return Status::IOError("Offset greater than file size.");
-    }
-    const uint64_t available = size_ - offset;
-    if (n > available) {
-      n = static_cast<size_t>(available);
-    }
-    if (n == 0) {
-      *result = Slice();
-      return Status::OK();
-    }
-
-    assert(offset / kBlockSize <= std::numeric_limits<size_t>::max());
-    size_t block = static_cast<size_t>(offset / kBlockSize);
-    size_t block_offset = offset % kBlockSize;
-    size_t bytes_to_copy = n;
-    char* dst = scratch;
-
-    while (bytes_to_copy > 0) {
-      size_t avail = kBlockSize - block_offset;
-      if (avail > bytes_to_copy) {
-        avail = bytes_to_copy;
-      }
-      std::memcpy(dst, blocks_[block] + block_offset, avail);
-
-      bytes_to_copy -= avail;
-      dst += avail;
-      block++;
-      block_offset = 0;
-    }
-
-    *result = Slice(scratch, n);
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status Append(const Slice& data) {
-    const char* src = data.data();
-    size_t src_len = data.size();
-
-    MutexLock lock(&blocks_mutex_);
-    while (src_len > 0) {
-      size_t avail;
-      size_t offset = size_ % kBlockSize;
-
-      if (offset != 0) {
-        // There is some room in the last block.
-        avail = kBlockSize - offset;
-      } else {
-        // No room in the last block; push new one.
-        blocks_.push_back(new char[kBlockSize]);
-        avail = kBlockSize;
-      }
-
-      if (avail > src_len) {
-        avail = src_len;
-      }
-      std::memcpy(blocks_.back() + offset, src, avail);
-      src_len -= avail;
-      src += avail;
-      size_ += avail;
-    }
-
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
   enum { kBlockSize = 8 * 1024 };
@@ -152,30 +77,18 @@ class FileState {
 class SequentialFileImpl : public SequentialFile {
  public:
   explicit SequentialFileImpl(FileState* file) : file_(file), pos_(0) {
-    file_->Ref();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   ~SequentialFileImpl() override { file_->Unref(); }
 
   Status Read(size_t n, Slice* result, char* scratch) override {
-    Status s = file_->Read(pos_, n, result, scratch);
-    if (s.ok()) {
-      pos_ += result->size();
-    }
-    return s;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status Skip(uint64_t n) override {
-    if (pos_ > file_->Size()) {
-      return Status::IOError("pos_ > file_->Size()");
-    }
-    const uint64_t available = file_->Size() - pos_;
-    if (n > available) {
-      n = available;
-    }
-    pos_ += n;
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
   FileState* file_;
@@ -184,14 +97,16 @@ class SequentialFileImpl : public SequentialFile {
 
 class RandomAccessFileImpl : public RandomAccessFile {
  public:
-  explicit RandomAccessFileImpl(FileState* file) : file_(file) { file_->Ref(); }
+  explicit RandomAccessFileImpl(FileState* file) : file_(file) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   ~RandomAccessFileImpl() override { file_->Unref(); }
 
   Status Read(uint64_t offset, size_t n, Slice* result,
               char* scratch) const override {
-    return file_->Read(offset, n, result, scratch);
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
   FileState* file_;
@@ -199,15 +114,25 @@ class RandomAccessFileImpl : public RandomAccessFile {
 
 class WritableFileImpl : public WritableFile {
  public:
-  WritableFileImpl(FileState* file) : file_(file) { file_->Ref(); }
+  WritableFileImpl(FileState* file) : file_(file) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   ~WritableFileImpl() override { file_->Unref(); }
 
-  Status Append(const Slice& data) override { return file_->Append(data); }
+  Status Append(const Slice& data) override {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-  Status Close() override { return Status::OK(); }
-  Status Flush() override { return Status::OK(); }
-  Status Sync() override { return Status::OK(); }
+  Status Close() override {
+    __builtin_trap() /* STUB: not implemented */;
+}
+  Status Flush() override {
+    __builtin_trap() /* STUB: not implemented */;
+}
+  Status Sync() override {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
   FileState* file_;
@@ -215,12 +140,16 @@ class WritableFileImpl : public WritableFile {
 
 class NoOpLogger : public Logger {
  public:
-  void Logv(const char* format, std::va_list ap) override {}
+  void Logv(const char* format, std::va_list ap) override {
+    __builtin_trap() /* STUB: not implemented */;
+}
 };
 
 class InMemoryEnv : public EnvWrapper {
  public:
-  explicit InMemoryEnv(Env* base_env) : EnvWrapper(base_env) {}
+  explicit InMemoryEnv(Env* base_env) : EnvWrapper(base_env) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   ~InMemoryEnv() override {
     for (const auto& kvp : file_map_) {
@@ -231,149 +160,74 @@ class InMemoryEnv : public EnvWrapper {
   // Partial implementation of the Env interface.
   Status NewSequentialFile(const std::string& fname,
                            SequentialFile** result) override {
-    MutexLock lock(&mutex_);
-    if (file_map_.find(fname) == file_map_.end()) {
-      *result = nullptr;
-      return Status::IOError(fname, "File not found");
-    }
-
-    *result = new SequentialFileImpl(file_map_[fname]);
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status NewRandomAccessFile(const std::string& fname,
                              RandomAccessFile** result) override {
-    MutexLock lock(&mutex_);
-    if (file_map_.find(fname) == file_map_.end()) {
-      *result = nullptr;
-      return Status::IOError(fname, "File not found");
-    }
-
-    *result = new RandomAccessFileImpl(file_map_[fname]);
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status NewWritableFile(const std::string& fname,
                          WritableFile** result) override {
-    MutexLock lock(&mutex_);
-    FileSystem::iterator it = file_map_.find(fname);
-
-    FileState* file;
-    if (it == file_map_.end()) {
-      // File is not currently open.
-      file = new FileState();
-      file->Ref();
-      file_map_[fname] = file;
-    } else {
-      file = it->second;
-      file->Truncate();
-    }
-
-    *result = new WritableFileImpl(file);
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status NewAppendableFile(const std::string& fname,
                            WritableFile** result) override {
-    MutexLock lock(&mutex_);
-    FileState** sptr = &file_map_[fname];
-    FileState* file = *sptr;
-    if (file == nullptr) {
-      file = new FileState();
-      file->Ref();
-    }
-    *result = new WritableFileImpl(file);
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   bool FileExists(const std::string& fname) override {
-    MutexLock lock(&mutex_);
-    return file_map_.find(fname) != file_map_.end();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status GetChildren(const std::string& dir,
                      std::vector<std::string>* result) override {
-    MutexLock lock(&mutex_);
-    result->clear();
-
-    for (const auto& kvp : file_map_) {
-      const std::string& filename = kvp.first;
-
-      if (filename.size() >= dir.size() + 1 && filename[dir.size()] == '/' &&
-          Slice(filename).starts_with(Slice(dir))) {
-        result->push_back(filename.substr(dir.size() + 1));
-      }
-    }
-
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   void RemoveFileInternal(const std::string& fname)
       EXCLUSIVE_LOCKS_REQUIRED(mutex_) {
-    if (file_map_.find(fname) == file_map_.end()) {
-      return;
-    }
-
-    file_map_[fname]->Unref();
-    file_map_.erase(fname);
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status RemoveFile(const std::string& fname) override {
-    MutexLock lock(&mutex_);
-    if (file_map_.find(fname) == file_map_.end()) {
-      return Status::IOError(fname, "File not found");
-    }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-    RemoveFileInternal(fname);
-    return Status::OK();
-  }
+  Status CreateDir(const std::string& dirname) override {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
-  Status CreateDir(const std::string& dirname) override { return Status::OK(); }
-
-  Status RemoveDir(const std::string& dirname) override { return Status::OK(); }
+  Status RemoveDir(const std::string& dirname) override {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status GetFileSize(const std::string& fname, uint64_t* file_size) override {
-    MutexLock lock(&mutex_);
-    if (file_map_.find(fname) == file_map_.end()) {
-      return Status::IOError(fname, "File not found");
-    }
-
-    *file_size = file_map_[fname]->Size();
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status RenameFile(const std::string& src,
                     const std::string& target) override {
-    MutexLock lock(&mutex_);
-    if (file_map_.find(src) == file_map_.end()) {
-      return Status::IOError(src, "File not found");
-    }
-
-    RemoveFileInternal(target);
-    file_map_[target] = file_map_[src];
-    file_map_.erase(src);
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status LockFile(const std::string& fname, FileLock** lock) override {
-    *lock = new FileLock;
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status UnlockFile(FileLock* lock) override {
-    delete lock;
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status GetTestDirectory(std::string* path) override {
-    *path = "/test";
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   Status NewLogger(const std::string& fname, Logger** result) override {
-    *result = new NoOpLogger;
-    return Status::OK();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
  private:
   // Map from filenames to FileState objects, representing a simple file system.
@@ -385,6 +239,8 @@ class InMemoryEnv : public EnvWrapper {
 
 }  // namespace
 
-Env* NewMemEnv(Env* base_env) { return new InMemoryEnv(base_env); }
+Env* NewMemEnv(Env* base_env) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
 }  // namespace leveldb

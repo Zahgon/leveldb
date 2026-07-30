@@ -1,3 +1,4 @@
+#include <stdexcept>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -182,149 +183,33 @@ class EnvPosixTest : public testing::Test {
 };
 
 TEST_F(EnvPosixTest, TestOpenOnRead) {
-  // Write some test data to a single file that will be opened |n| times.
-  std::string test_dir;
-  ASSERT_LEVELDB_OK(env_->GetTestDirectory(&test_dir));
-  std::string test_file = test_dir + "/open_on_read.txt";
-
-  FILE* f = std::fopen(test_file.c_str(), "we");
-  ASSERT_TRUE(f != nullptr);
-  const char kFileData[] = "abcdefghijklmnopqrstuvwxyz";
-  fputs(kFileData, f);
-  std::fclose(f);
-
-  // Open test file some number above the sum of the two limits to force
-  // open-on-read behavior of POSIX Env leveldb::RandomAccessFile.
-  const int kNumFiles = kReadOnlyFileLimit + kMMapLimit + 5;
-  leveldb::RandomAccessFile* files[kNumFiles] = {0};
-  for (int i = 0; i < kNumFiles; i++) {
-    ASSERT_LEVELDB_OK(env_->NewRandomAccessFile(test_file, &files[i]));
-  }
-  char scratch;
-  Slice read_result;
-  for (int i = 0; i < kNumFiles; i++) {
-    ASSERT_LEVELDB_OK(files[i]->Read(i, 1, &read_result, &scratch));
-    ASSERT_EQ(kFileData[i], read_result[0]);
-  }
-  for (int i = 0; i < kNumFiles; i++) {
-    delete files[i];
-  }
-  ASSERT_LEVELDB_OK(env_->RemoveFile(test_file));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 #if HAVE_O_CLOEXEC
 
 TEST_F(EnvPosixTest, TestCloseOnExecSequentialFile) {
-  std::unordered_set<int> open_fds;
-  GetOpenFileDescriptors(&open_fds);
-
-  std::string test_dir;
-  ASSERT_LEVELDB_OK(env_->GetTestDirectory(&test_dir));
-  std::string file_path = test_dir + "/close_on_exec_sequential.txt";
-  ASSERT_LEVELDB_OK(WriteStringToFile(env_, "0123456789", file_path));
-
-  leveldb::SequentialFile* file = nullptr;
-  ASSERT_LEVELDB_OK(env_->NewSequentialFile(file_path, &file));
-  CheckCloseOnExecDoesNotLeakFDs(open_fds);
-  delete file;
-
-  ASSERT_LEVELDB_OK(env_->RemoveFile(file_path));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(EnvPosixTest, TestCloseOnExecRandomAccessFile) {
-  std::unordered_set<int> open_fds;
-  GetOpenFileDescriptors(&open_fds);
-
-  std::string test_dir;
-  ASSERT_LEVELDB_OK(env_->GetTestDirectory(&test_dir));
-  std::string file_path = test_dir + "/close_on_exec_random_access.txt";
-  ASSERT_LEVELDB_OK(WriteStringToFile(env_, "0123456789", file_path));
-
-  // Exhaust the RandomAccessFile mmap limit. This way, the test
-  // RandomAccessFile instance below is backed by a file descriptor, not by an
-  // mmap region.
-  leveldb::RandomAccessFile* mmapped_files[kMMapLimit];
-  for (int i = 0; i < kMMapLimit; i++) {
-    ASSERT_LEVELDB_OK(env_->NewRandomAccessFile(file_path, &mmapped_files[i]));
-  }
-
-  leveldb::RandomAccessFile* file = nullptr;
-  ASSERT_LEVELDB_OK(env_->NewRandomAccessFile(file_path, &file));
-  CheckCloseOnExecDoesNotLeakFDs(open_fds);
-  delete file;
-
-  for (int i = 0; i < kMMapLimit; i++) {
-    delete mmapped_files[i];
-  }
-  ASSERT_LEVELDB_OK(env_->RemoveFile(file_path));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(EnvPosixTest, TestCloseOnExecWritableFile) {
-  std::unordered_set<int> open_fds;
-  GetOpenFileDescriptors(&open_fds);
-
-  std::string test_dir;
-  ASSERT_LEVELDB_OK(env_->GetTestDirectory(&test_dir));
-  std::string file_path = test_dir + "/close_on_exec_writable.txt";
-  ASSERT_LEVELDB_OK(WriteStringToFile(env_, "0123456789", file_path));
-
-  leveldb::WritableFile* file = nullptr;
-  ASSERT_LEVELDB_OK(env_->NewWritableFile(file_path, &file));
-  CheckCloseOnExecDoesNotLeakFDs(open_fds);
-  delete file;
-
-  ASSERT_LEVELDB_OK(env_->RemoveFile(file_path));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(EnvPosixTest, TestCloseOnExecAppendableFile) {
-  std::unordered_set<int> open_fds;
-  GetOpenFileDescriptors(&open_fds);
-
-  std::string test_dir;
-  ASSERT_LEVELDB_OK(env_->GetTestDirectory(&test_dir));
-  std::string file_path = test_dir + "/close_on_exec_appendable.txt";
-  ASSERT_LEVELDB_OK(WriteStringToFile(env_, "0123456789", file_path));
-
-  leveldb::WritableFile* file = nullptr;
-  ASSERT_LEVELDB_OK(env_->NewAppendableFile(file_path, &file));
-  CheckCloseOnExecDoesNotLeakFDs(open_fds);
-  delete file;
-
-  ASSERT_LEVELDB_OK(env_->RemoveFile(file_path));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(EnvPosixTest, TestCloseOnExecLockFile) {
-  std::unordered_set<int> open_fds;
-  GetOpenFileDescriptors(&open_fds);
-
-  std::string test_dir;
-  ASSERT_LEVELDB_OK(env_->GetTestDirectory(&test_dir));
-  std::string file_path = test_dir + "/close_on_exec_lock.txt";
-  ASSERT_LEVELDB_OK(WriteStringToFile(env_, "0123456789", file_path));
-
-  leveldb::FileLock* lock = nullptr;
-  ASSERT_LEVELDB_OK(env_->LockFile(file_path, &lock));
-  CheckCloseOnExecDoesNotLeakFDs(open_fds);
-  ASSERT_LEVELDB_OK(env_->UnlockFile(lock));
-
-  ASSERT_LEVELDB_OK(env_->RemoveFile(file_path));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(EnvPosixTest, TestCloseOnExecLogger) {
-  std::unordered_set<int> open_fds;
-  GetOpenFileDescriptors(&open_fds);
-
-  std::string test_dir;
-  ASSERT_LEVELDB_OK(env_->GetTestDirectory(&test_dir));
-  std::string file_path = test_dir + "/close_on_exec_logger.txt";
-  ASSERT_LEVELDB_OK(WriteStringToFile(env_, "0123456789", file_path));
-
-  leveldb::Logger* file = nullptr;
-  ASSERT_LEVELDB_OK(env_->NewLogger(file_path, &file));
-  CheckCloseOnExecDoesNotLeakFDs(open_fds);
-  delete file;
-
-  ASSERT_LEVELDB_OK(env_->RemoveFile(file_path));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 #endif  // HAVE_O_CLOEXEC

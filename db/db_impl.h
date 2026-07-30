@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -88,13 +90,13 @@ class DBImpl : public DB {
   // Per level compaction stats.  stats_[level] stores the stats for
   // compactions that produced data for the specified "level".
   struct CompactionStats {
-    CompactionStats() : micros(0), bytes_read(0), bytes_written(0) {}
+    CompactionStats() : micros(0), bytes_read(0), bytes_written(0) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
     void Add(const CompactionStats& c) {
-      this->micros += c.micros;
-      this->bytes_read += c.bytes_read;
-      this->bytes_written += c.bytes_written;
-    }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
     int64_t micros;
     int64_t bytes_read;
@@ -152,8 +154,8 @@ class DBImpl : public DB {
       EXCLUSIVE_LOCKS_REQUIRED(mutex_);
 
   const Comparator* user_comparator() const {
-    return internal_comparator_.user_comparator();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Constant after construction
   Env* const env_;

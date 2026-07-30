@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -28,12 +30,20 @@ class BlockHandle {
   BlockHandle();
 
   // The offset of the block in the file.
-  uint64_t offset() const { return offset_; }
-  void set_offset(uint64_t offset) { offset_ = offset; }
+  uint64_t offset() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
+  void set_offset(uint64_t offset) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // The size of the stored block
-  uint64_t size() const { return size_; }
-  void set_size(uint64_t size) { size_ = size; }
+  uint64_t size() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
+  void set_size(uint64_t size) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   void EncodeTo(std::string* dst) const;
   Status DecodeFrom(Slice* input);
@@ -55,12 +65,20 @@ class Footer {
   Footer() = default;
 
   // The block handle for the metaindex block of the table
-  const BlockHandle& metaindex_handle() const { return metaindex_handle_; }
-  void set_metaindex_handle(const BlockHandle& h) { metaindex_handle_ = h; }
+  const BlockHandle& metaindex_handle() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
+  void set_metaindex_handle(const BlockHandle& h) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // The block handle for the index block of the table
-  const BlockHandle& index_handle() const { return index_handle_; }
-  void set_index_handle(const BlockHandle& h) { index_handle_ = h; }
+  const BlockHandle& index_handle() const {
+    __builtin_trap() /* STUB: not implemented */;
+}
+  void set_index_handle(const BlockHandle& h) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   void EncodeTo(std::string* dst) const;
   Status DecodeFrom(Slice* input);
@@ -92,7 +110,9 @@ Status ReadBlock(RandomAccessFile* file, const ReadOptions& options,
 // Implementation details follow.  Clients should ignore,
 
 inline BlockHandle::BlockHandle()
-    : offset_(~static_cast<uint64_t>(0)), size_(~static_cast<uint64_t>(0)) {}
+    : offset_(~static_cast<uint64_t>(0)), size_(~static_cast<uint64_t>(0)) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
 }  // namespace leveldb
 

@@ -36,51 +36,12 @@ class FaultInjectionTestEnv;
 namespace {
 
 // Assume a filename, and not a directory name like "/foo/bar/"
-static std::string GetDirName(const std::string& filename) {
-  size_t found = filename.find_last_of("/\\");
-  if (found == std::string::npos) {
-    return "";
-  } else {
-    return filename.substr(0, found);
-  }
-}
+static std::string GetDirName(const std::string& filename) { __builtin_trap() /* STUB: not implemented */; }
 
-Status SyncDir(const std::string& dir) {
-  // As this is a test it isn't required to *actually* sync this directory.
-  return Status::OK();
-}
+Status SyncDir(const std::string& dir) { __builtin_trap() /* STUB: not implemented */; }
 
 // A basic file truncation function suitable for this test.
-Status Truncate(const std::string& filename, uint64_t length) {
-  leveldb::Env* env = leveldb::Env::Default();
-
-  SequentialFile* orig_file;
-  Status s = env->NewSequentialFile(filename, &orig_file);
-  if (!s.ok()) return s;
-
-  char* scratch = new char[length];
-  leveldb::Slice result;
-  s = orig_file->Read(length, &result, scratch);
-  delete orig_file;
-  if (s.ok()) {
-    std::string tmp_name = GetDirName(filename) + "/truncate.tmp";
-    WritableFile* tmp_file;
-    s = env->NewWritableFile(tmp_name, &tmp_file);
-    if (s.ok()) {
-      s = tmp_file->Append(result);
-      delete tmp_file;
-      if (s.ok()) {
-        s = env->RenameFile(tmp_name, filename);
-      } else {
-        env->RemoveFile(tmp_name);
-      }
-    }
-  }
-
-  delete[] scratch;
-
-  return s;
-}
+Status Truncate(const std::string& filename, uint64_t length) { __builtin_trap() /* STUB: not implemented */; }
 
 struct FileState {
   std::string filename_;
@@ -92,11 +53,11 @@ struct FileState {
       : filename_(filename),
         pos_(-1),
         pos_at_last_sync_(-1),
-        pos_at_last_flush_(-1) {}
+        pos_at_last_flush_(-1) { __builtin_trap() /* STUB: not implemented */; }
 
-  FileState() : pos_(-1), pos_at_last_sync_(-1), pos_at_last_flush_(-1) {}
+  FileState() : pos_(-1), pos_at_last_sync_(-1), pos_at_last_flush_(-1) { __builtin_trap() /* STUB: not implemented */; }
 
-  bool IsFullySynced() const { return pos_ <= 0 || pos_ == pos_at_last_sync_; }
+  bool IsFullySynced() const { __builtin_trap() /* STUB: not implemented */; }
 
   Status DropUnsyncedData() const;
 };
@@ -127,7 +88,7 @@ class TestWritableFile : public WritableFile {
 class FaultInjectionTestEnv : public EnvWrapper {
  public:
   FaultInjectionTestEnv()
-      : EnvWrapper(Env::Default()), filesystem_active_(true) {}
+      : EnvWrapper(Env::Default()), filesystem_active_(true) { __builtin_trap() /* STUB: not implemented */; }
   ~FaultInjectionTestEnv() override = default;
   Status NewWritableFile(const std::string& fname,
                          WritableFile** result) override;
@@ -165,201 +126,47 @@ class FaultInjectionTestEnv : public EnvWrapper {
 
 TestWritableFile::TestWritableFile(const FileState& state, WritableFile* f,
                                    FaultInjectionTestEnv* env)
-    : state_(state), target_(f), writable_file_opened_(true), env_(env) {
-  assert(f != nullptr);
-}
+    : state_(state), target_(f), writable_file_opened_(true), env_(env) { __builtin_trap() /* STUB: not implemented */; }
 
-TestWritableFile::~TestWritableFile() {
-  if (writable_file_opened_) {
-    Close();
-  }
-  delete target_;
-}
+TestWritableFile::~TestWritableFile() { __builtin_trap() /* STUB: not implemented */; }
 
-Status TestWritableFile::Append(const Slice& data) {
-  Status s = target_->Append(data);
-  if (s.ok() && env_->IsFilesystemActive()) {
-    state_.pos_ += data.size();
-  }
-  return s;
-}
+Status TestWritableFile::Append(const Slice& data) { __builtin_trap() /* STUB: not implemented */; }
 
-Status TestWritableFile::Close() {
-  writable_file_opened_ = false;
-  Status s = target_->Close();
-  if (s.ok()) {
-    env_->WritableFileClosed(state_);
-  }
-  return s;
-}
+Status TestWritableFile::Close() { __builtin_trap() /* STUB: not implemented */; }
 
-Status TestWritableFile::Flush() {
-  Status s = target_->Flush();
-  if (s.ok() && env_->IsFilesystemActive()) {
-    state_.pos_at_last_flush_ = state_.pos_;
-  }
-  return s;
-}
+Status TestWritableFile::Flush() { __builtin_trap() /* STUB: not implemented */; }
 
-Status TestWritableFile::SyncParent() {
-  Status s = SyncDir(GetDirName(state_.filename_));
-  if (s.ok()) {
-    env_->DirWasSynced();
-  }
-  return s;
-}
+Status TestWritableFile::SyncParent() { __builtin_trap() /* STUB: not implemented */; }
 
-Status TestWritableFile::Sync() {
-  if (!env_->IsFilesystemActive()) {
-    return Status::OK();
-  }
-  // Ensure new files referred to by the manifest are in the filesystem.
-  Status s = target_->Sync();
-  if (s.ok()) {
-    state_.pos_at_last_sync_ = state_.pos_;
-  }
-  if (env_->IsFileCreatedSinceLastDirSync(state_.filename_)) {
-    Status ps = SyncParent();
-    if (s.ok() && !ps.ok()) {
-      s = ps;
-    }
-  }
-  return s;
-}
+Status TestWritableFile::Sync() { __builtin_trap() /* STUB: not implemented */; }
 
 Status FaultInjectionTestEnv::NewWritableFile(const std::string& fname,
-                                              WritableFile** result) {
-  WritableFile* actual_writable_file;
-  Status s = target()->NewWritableFile(fname, &actual_writable_file);
-  if (s.ok()) {
-    FileState state(fname);
-    state.pos_ = 0;
-    *result = new TestWritableFile(state, actual_writable_file, this);
-    // NewWritableFile doesn't append to files, so if the same file is
-    // opened again then it will be truncated - so forget our saved
-    // state.
-    UntrackFile(fname);
-    MutexLock l(&mutex_);
-    new_files_since_last_dir_sync_.insert(fname);
-  }
-  return s;
-}
+                                              WritableFile** result) { __builtin_trap() /* STUB: not implemented */; }
 
 Status FaultInjectionTestEnv::NewAppendableFile(const std::string& fname,
-                                                WritableFile** result) {
-  WritableFile* actual_writable_file;
-  Status s = target()->NewAppendableFile(fname, &actual_writable_file);
-  if (s.ok()) {
-    FileState state(fname);
-    state.pos_ = 0;
-    {
-      MutexLock l(&mutex_);
-      if (db_file_state_.count(fname) == 0) {
-        new_files_since_last_dir_sync_.insert(fname);
-      } else {
-        state = db_file_state_[fname];
-      }
-    }
-    *result = new TestWritableFile(state, actual_writable_file, this);
-  }
-  return s;
-}
+                                                WritableFile** result) { __builtin_trap() /* STUB: not implemented */; }
 
-Status FaultInjectionTestEnv::DropUnsyncedFileData() {
-  Status s;
-  MutexLock l(&mutex_);
-  for (const auto& kvp : db_file_state_) {
-    if (!s.ok()) {
-      break;
-    }
-    const FileState& state = kvp.second;
-    if (!state.IsFullySynced()) {
-      s = state.DropUnsyncedData();
-    }
-  }
-  return s;
-}
+Status FaultInjectionTestEnv::DropUnsyncedFileData() { __builtin_trap() /* STUB: not implemented */; }
 
-void FaultInjectionTestEnv::DirWasSynced() {
-  MutexLock l(&mutex_);
-  new_files_since_last_dir_sync_.clear();
-}
+void FaultInjectionTestEnv::DirWasSynced() { __builtin_trap() /* STUB: not implemented */; }
 
 bool FaultInjectionTestEnv::IsFileCreatedSinceLastDirSync(
-    const std::string& filename) {
-  MutexLock l(&mutex_);
-  return new_files_since_last_dir_sync_.find(filename) !=
-         new_files_since_last_dir_sync_.end();
-}
+    const std::string& filename) { __builtin_trap() /* STUB: not implemented */; }
 
-void FaultInjectionTestEnv::UntrackFile(const std::string& f) {
-  MutexLock l(&mutex_);
-  db_file_state_.erase(f);
-  new_files_since_last_dir_sync_.erase(f);
-}
+void FaultInjectionTestEnv::UntrackFile(const std::string& f) { __builtin_trap() /* STUB: not implemented */; }
 
-Status FaultInjectionTestEnv::RemoveFile(const std::string& f) {
-  Status s = EnvWrapper::RemoveFile(f);
-  EXPECT_LEVELDB_OK(s);
-  if (s.ok()) {
-    UntrackFile(f);
-  }
-  return s;
-}
+Status FaultInjectionTestEnv::RemoveFile(const std::string& f) { __builtin_trap() /* STUB: not implemented */; }
 
 Status FaultInjectionTestEnv::RenameFile(const std::string& s,
-                                         const std::string& t) {
-  Status ret = EnvWrapper::RenameFile(s, t);
+                                         const std::string& t) { __builtin_trap() /* STUB: not implemented */; }
 
-  if (ret.ok()) {
-    MutexLock l(&mutex_);
-    if (db_file_state_.find(s) != db_file_state_.end()) {
-      db_file_state_[t] = db_file_state_[s];
-      db_file_state_.erase(s);
-    }
+void FaultInjectionTestEnv::ResetState() { __builtin_trap() /* STUB: not implemented */; }
 
-    if (new_files_since_last_dir_sync_.erase(s) != 0) {
-      assert(new_files_since_last_dir_sync_.find(t) ==
-             new_files_since_last_dir_sync_.end());
-      new_files_since_last_dir_sync_.insert(t);
-    }
-  }
+Status FaultInjectionTestEnv::RemoveFilesCreatedAfterLastDirSync() { __builtin_trap() /* STUB: not implemented */; }
 
-  return ret;
-}
+void FaultInjectionTestEnv::WritableFileClosed(const FileState& state) { __builtin_trap() /* STUB: not implemented */; }
 
-void FaultInjectionTestEnv::ResetState() {
-  // Since we are not destroying the database, the existing files
-  // should keep their recorded synced/flushed state. Therefore
-  // we do not reset db_file_state_ and new_files_since_last_dir_sync_.
-  SetFilesystemActive(true);
-}
-
-Status FaultInjectionTestEnv::RemoveFilesCreatedAfterLastDirSync() {
-  // Because RemoveFile access this container make a copy to avoid deadlock
-  mutex_.Lock();
-  std::set<std::string> new_files(new_files_since_last_dir_sync_.begin(),
-                                  new_files_since_last_dir_sync_.end());
-  mutex_.Unlock();
-  Status status;
-  for (const auto& new_file : new_files) {
-    Status remove_status = RemoveFile(new_file);
-    if (!remove_status.ok() && status.ok()) {
-      status = std::move(remove_status);
-    }
-  }
-  return status;
-}
-
-void FaultInjectionTestEnv::WritableFileClosed(const FileState& state) {
-  MutexLock l(&mutex_);
-  db_file_state_[state.filename_] = state;
-}
-
-Status FileState::DropUnsyncedData() const {
-  int64_t sync_pos = pos_at_last_sync_ == -1 ? 0 : pos_at_last_sync_;
-  return Truncate(filename_, sync_pos);
-}
+Status FileState::DropUnsyncedData() const { __builtin_trap() /* STUB: not implemented */; }
 
 class FaultInjectionTest : public testing::Test {
  public:
@@ -375,166 +182,43 @@ class FaultInjectionTest : public testing::Test {
   FaultInjectionTest()
       : env_(new FaultInjectionTestEnv),
         tiny_cache_(NewLRUCache(100)),
-        db_(nullptr) {
-    dbname_ = testing::TempDir() + "fault_test";
-    DestroyDB(dbname_, Options());  // Destroy any db from earlier run
-    options_.reuse_logs = true;
-    options_.env = env_;
-    options_.paranoid_checks = true;
-    options_.block_cache = tiny_cache_;
-    options_.create_if_missing = true;
-  }
+        db_(nullptr) { __builtin_trap() /* STUB: not implemented */; }
 
-  ~FaultInjectionTest() {
-    CloseDB();
-    DestroyDB(dbname_, Options());
-    delete tiny_cache_;
-    delete env_;
-  }
+  ~FaultInjectionTest() { __builtin_trap() /* STUB: not implemented */; }
 
-  void ReuseLogs(bool reuse) { options_.reuse_logs = reuse; }
+  void ReuseLogs(bool reuse) { __builtin_trap() /* STUB: not implemented */; }
 
-  void Build(int start_idx, int num_vals) {
-    std::string key_space, value_space;
-    WriteBatch batch;
-    for (int i = start_idx; i < start_idx + num_vals; i++) {
-      Slice key = Key(i, &key_space);
-      batch.Clear();
-      batch.Put(key, Value(i, &value_space));
-      WriteOptions options;
-      ASSERT_LEVELDB_OK(db_->Write(options, &batch));
-    }
-  }
+  void Build(int start_idx, int num_vals) { __builtin_trap() /* STUB: not implemented */; }
 
-  Status ReadValue(int i, std::string* val) const {
-    std::string key_space, value_space;
-    Slice key = Key(i, &key_space);
-    Value(i, &value_space);
-    ReadOptions options;
-    return db_->Get(options, key, val);
-  }
+  Status ReadValue(int i, std::string* val) const { __builtin_trap() /* STUB: not implemented */; }
 
   Status Verify(int start_idx, int num_vals,
-                ExpectedVerifResult expected) const {
-    std::string val;
-    std::string value_space;
-    Status s;
-    for (int i = start_idx; i < start_idx + num_vals && s.ok(); i++) {
-      Value(i, &value_space);
-      s = ReadValue(i, &val);
-      if (expected == VAL_EXPECT_NO_ERROR) {
-        if (s.ok()) {
-          EXPECT_EQ(value_space, val);
-        }
-      } else if (s.ok()) {
-        std::fprintf(stderr, "Expected an error at %d, but was OK\n", i);
-        s = Status::IOError(dbname_, "Expected value error:");
-      } else {
-        s = Status::OK();  // An expected error
-      }
-    }
-    return s;
-  }
+                ExpectedVerifResult expected) const { __builtin_trap() /* STUB: not implemented */; }
 
   // Return the ith key
-  Slice Key(int i, std::string* storage) const {
-    char buf[100];
-    std::snprintf(buf, sizeof(buf), "%016d", i);
-    storage->assign(buf, strlen(buf));
-    return Slice(*storage);
-  }
+  Slice Key(int i, std::string* storage) const { __builtin_trap() /* STUB: not implemented */; }
 
   // Return the value to associate with the specified key
-  Slice Value(int k, std::string* storage) const {
-    Random r(k);
-    return test::RandomString(&r, kValueSize, storage);
-  }
+  Slice Value(int k, std::string* storage) const { __builtin_trap() /* STUB: not implemented */; }
 
-  Status OpenDB() {
-    delete db_;
-    db_ = nullptr;
-    env_->ResetState();
-    return DB::Open(options_, dbname_, &db_);
-  }
+  Status OpenDB() { __builtin_trap() /* STUB: not implemented */; }
 
-  void CloseDB() {
-    delete db_;
-    db_ = nullptr;
-  }
+  void CloseDB() { __builtin_trap() /* STUB: not implemented */; }
 
-  void DeleteAllData() {
-    Iterator* iter = db_->NewIterator(ReadOptions());
-    for (iter->SeekToFirst(); iter->Valid(); iter->Next()) {
-      ASSERT_LEVELDB_OK(db_->Delete(WriteOptions(), iter->key()));
-    }
+  void DeleteAllData() { __builtin_trap() /* STUB: not implemented */; }
 
-    delete iter;
-  }
+  void ResetDBState(ResetMethod reset_method) { __builtin_trap() /* STUB: not implemented */; }
 
-  void ResetDBState(ResetMethod reset_method) {
-    switch (reset_method) {
-      case RESET_DROP_UNSYNCED_DATA:
-        ASSERT_LEVELDB_OK(env_->DropUnsyncedFileData());
-        break;
-      case RESET_DELETE_UNSYNCED_FILES:
-        ASSERT_LEVELDB_OK(env_->RemoveFilesCreatedAfterLastDirSync());
-        break;
-      default:
-        assert(false);
-    }
-  }
-
-  void PartialCompactTestPreFault(int num_pre_sync, int num_post_sync) {
-    DeleteAllData();
-    Build(0, num_pre_sync);
-    db_->CompactRange(nullptr, nullptr);
-    Build(num_pre_sync, num_post_sync);
-  }
+  void PartialCompactTestPreFault(int num_pre_sync, int num_post_sync) { __builtin_trap() /* STUB: not implemented */; }
 
   void PartialCompactTestReopenWithFault(ResetMethod reset_method,
-                                         int num_pre_sync, int num_post_sync) {
-    env_->SetFilesystemActive(false);
-    CloseDB();
-    ResetDBState(reset_method);
-    ASSERT_LEVELDB_OK(OpenDB());
-    ASSERT_LEVELDB_OK(
-        Verify(0, num_pre_sync, FaultInjectionTest::VAL_EXPECT_NO_ERROR));
-    ASSERT_LEVELDB_OK(Verify(num_pre_sync, num_post_sync,
-                             FaultInjectionTest::VAL_EXPECT_ERROR));
-  }
+                                         int num_pre_sync, int num_post_sync) { __builtin_trap() /* STUB: not implemented */; }
 
-  void NoWriteTestPreFault() {}
+  void NoWriteTestPreFault() { __builtin_trap() /* STUB: not implemented */; }
 
-  void NoWriteTestReopenWithFault(ResetMethod reset_method) {
-    CloseDB();
-    ResetDBState(reset_method);
-    ASSERT_LEVELDB_OK(OpenDB());
-  }
+  void NoWriteTestReopenWithFault(ResetMethod reset_method) { __builtin_trap() /* STUB: not implemented */; }
 
-  void DoTest() {
-    Random rnd(0);
-    ASSERT_LEVELDB_OK(OpenDB());
-    for (size_t idx = 0; idx < kNumIterations; idx++) {
-      int num_pre_sync = rnd.Uniform(kMaxNumValues);
-      int num_post_sync = rnd.Uniform(kMaxNumValues);
-
-      PartialCompactTestPreFault(num_pre_sync, num_post_sync);
-      PartialCompactTestReopenWithFault(RESET_DROP_UNSYNCED_DATA, num_pre_sync,
-                                        num_post_sync);
-
-      NoWriteTestPreFault();
-      NoWriteTestReopenWithFault(RESET_DROP_UNSYNCED_DATA);
-
-      PartialCompactTestPreFault(num_pre_sync, num_post_sync);
-      // No new files created so we expect all values since no files will be
-      // dropped.
-      PartialCompactTestReopenWithFault(RESET_DELETE_UNSYNCED_FILES,
-                                        num_pre_sync + num_post_sync, 0);
-
-      NoWriteTestPreFault();
-      NoWriteTestReopenWithFault(RESET_DELETE_UNSYNCED_FILES);
-    }
-  }
+  void DoTest() { __builtin_trap() /* STUB: not implemented */; }
 };
 
 TEST_F(FaultInjectionTest, FaultTestNoLogReuse) {

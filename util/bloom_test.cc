@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2012 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -80,17 +82,11 @@ class BloomTest : public testing::Test {
 };
 
 TEST_F(BloomTest, EmptyFilter) {
-  ASSERT_TRUE(!Matches("hello"));
-  ASSERT_TRUE(!Matches("world"));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 TEST_F(BloomTest, Small) {
-  Add("hello");
-  Add("world");
-  ASSERT_TRUE(Matches("hello"));
-  ASSERT_TRUE(Matches("world"));
-  ASSERT_TRUE(!Matches("x"));
-  ASSERT_TRUE(!Matches("foo"));
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 static int NextLength(int length) {
@@ -107,46 +103,7 @@ static int NextLength(int length) {
 }
 
 TEST_F(BloomTest, VaryingLengths) {
-  char buffer[sizeof(int)];
-
-  // Count number of filters that significantly exceed the false positive rate
-  int mediocre_filters = 0;
-  int good_filters = 0;
-
-  for (int length = 1; length <= 10000; length = NextLength(length)) {
-    Reset();
-    for (int i = 0; i < length; i++) {
-      Add(Key(i, buffer));
-    }
-    Build();
-
-    ASSERT_LE(FilterSize(), static_cast<size_t>((length * 10 / 8) + 40))
-        << length;
-
-    // All added keys must match
-    for (int i = 0; i < length; i++) {
-      ASSERT_TRUE(Matches(Key(i, buffer)))
-          << "Length " << length << "; key " << i;
-    }
-
-    // Check false positive rate
-    double rate = FalsePositiveRate();
-    if (kVerbose >= 1) {
-      std::fprintf(stderr,
-                   "False positives: %5.2f%% @ length = %6d ; bytes = %6d\n",
-                   rate * 100.0, length, static_cast<int>(FilterSize()));
-    }
-    ASSERT_LE(rate, 0.02);  // Must not be over 2%
-    if (rate > 0.0125)
-      mediocre_filters++;  // Allowed, but not too often
-    else
-      good_filters++;
-  }
-  if (kVerbose >= 1) {
-    std::fprintf(stderr, "Filters: %d good, %d mediocre\n", good_filters,
-                 mediocre_filters);
-  }
-  ASSERT_LE(mediocre_filters, good_filters / 5);
+    __builtin_trap() /* STUB: not implemented */;
 }
 
 // Different bits-per-byte

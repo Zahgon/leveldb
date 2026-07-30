@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cstdlib>
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -16,7 +18,9 @@ namespace leveldb {
 class VersionSet;
 
 struct FileMetaData {
-  FileMetaData() : refs(0), allowed_seeks(1 << 30), file_size(0) {}
+  FileMetaData() : refs(0), allowed_seeks(1 << 30), file_size(0) {
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   int refs;
   int allowed_seeks;  // Seeks allowed until compaction
@@ -28,52 +32,44 @@ struct FileMetaData {
 
 class VersionEdit {
  public:
-  VersionEdit() { Clear(); }
+  VersionEdit() {
+    __builtin_trap() /* STUB: not implemented */;
+}
   ~VersionEdit() = default;
 
   void Clear();
 
   void SetComparatorName(const Slice& name) {
-    has_comparator_ = true;
-    comparator_ = name.ToString();
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
   void SetLogNumber(uint64_t num) {
-    has_log_number_ = true;
-    log_number_ = num;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
   void SetPrevLogNumber(uint64_t num) {
-    has_prev_log_number_ = true;
-    prev_log_number_ = num;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
   void SetNextFile(uint64_t num) {
-    has_next_file_number_ = true;
-    next_file_number_ = num;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
   void SetLastSequence(SequenceNumber seq) {
-    has_last_sequence_ = true;
-    last_sequence_ = seq;
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
   void SetCompactPointer(int level, const InternalKey& key) {
-    compact_pointers_.push_back(std::make_pair(level, key));
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Add the specified file at the specified number.
   // REQUIRES: This version has not been saved (see VersionSet::SaveTo)
   // REQUIRES: "smallest" and "largest" are smallest and largest keys in file
   void AddFile(int level, uint64_t file, uint64_t file_size,
                const InternalKey& smallest, const InternalKey& largest) {
-    FileMetaData f;
-    f.number = file;
-    f.file_size = file_size;
-    f.smallest = smallest;
-    f.largest = largest;
-    new_files_.push_back(std::make_pair(level, f));
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   // Delete the specified "file" from the specified "level".
   void RemoveFile(int level, uint64_t file) {
-    deleted_files_.insert(std::make_pair(level, file));
-  }
+    __builtin_trap() /* STUB: not implemented */;
+}
 
   void EncodeTo(std::string* dst) const;
   Status DecodeFrom(const Slice& src);
